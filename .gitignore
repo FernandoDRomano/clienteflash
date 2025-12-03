@@ -1,0 +1,4 @@
+# Ignorar carpetas donde se almacenan las imagenes de las firmas
+XMLHttpRequest/FirmasDeClientes/uploads/
+# Ignorar carpetas donde se almacenan los reportes
+cliente_flash_reportes/files/
