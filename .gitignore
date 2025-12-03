@@ -2,3 +2,5 @@
 XMLHttpRequest/FirmasDeClientes/uploads/
 # Ignorar carpetas donde se almacenan los reportes
 cliente_flash_reportes/files/
+# Ignorar carpetas temporales de sesiones
+tmp/
