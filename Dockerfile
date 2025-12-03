@@ -14,6 +14,9 @@ WORKDIR /var/www/html
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www/html
 
+# Crear y dar permisos a la carpeta tmp para sesiones
+RUN mkdir -p /var/www/html/tmp && chmod 777 /var/www/html/tmp
+
 # Habilitar AllowOverride All para .htaccess
 RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
