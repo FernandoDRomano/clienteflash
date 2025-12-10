@@ -1,7 +1,5 @@
 function Loading(){
-	console.log("Loading...");
 	let overlay = document.getElementById('loading-overlay');
-    console.log(overlay);
     if (!overlay) {
         // crear dinámicamente el overlay si no existe
         overlay = document.createElement('div');
