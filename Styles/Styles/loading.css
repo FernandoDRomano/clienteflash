@@ -1,0 +1,98 @@
+/* #loading {
+  position: fixed;
+  inset: 0;
+  z-index: 10062;
+  display: none; 
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.25);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+#loading::before,
+#loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+#loading::before {
+  width: 8px;
+  height: 8px;
+  background: #1f7cbf; 
+  z-index: 10063;
+}
+
+#loading::after {
+  width: 64px;
+  height: 64px;
+  background: rgba(31,124,191,0.12);
+  z-index: 10062;
+  animation: pulse-ring 1.6s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(31,124,191,0.35);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+    box-shadow: 0 0 0 28px rgba(31,124,191,0);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(31,124,191,0);
+  }
+}
+ */
+
+/* ===========================
+LOADING OVERLAY
+=========================== */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(1px); /* efecto de desenfoque */
+    background: rgba(0, 0, 0, 0.3); /* fondo oscuro semitransparente */
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.3s ease;
+}
+
+#loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===========================
+   LOADER SVG (onda expansiva)
+   =========================== */
+.loader {
+    width: 150px;
+    height: 150px;
+}
+
+.loader svg {
+    width: 100%;
+    height: 100%;
+}
+
+.loader circle {
+    stroke: #1f7cbf;
+}
