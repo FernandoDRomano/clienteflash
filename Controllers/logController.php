@@ -16,10 +16,7 @@
 		public function __construct() {
 			$this->log = new Log();
 			$this->mail = new PHPMailer(true);
-			/*
-			$UsuarioGet = $_SESSION['UsuarioGet'];
-			$PasswordGet = $_SESSION['PasswordGet'];
-			*/
+			date_default_timezone_set("America/Argentina/Tucuman");
 		}
 		
 		public function validar(){
@@ -31,20 +28,67 @@
 				echo('<script>window.location.replace("' . URL . 'principal/inicio");</script>');exit;
 			}
 		} 
+
+		public function cambiar_password_cliente(){
+			$_SESSION['password_reset_validated'] = false;
+			$_SESSION['password_reset_message'] = '';
+			$_SESSION['password_reset_cliente_id'] = null;
+			$_SESSION['password_reset_selector'] = null;
+			$_SESSION['password_reset_validator'] = null;
+
+			$selector = issetornull('selector');
+			$validator = issetornull('validator');
+
+			if(empty($selector) || empty($validator)){
+				$_SESSION['password_reset_message'] = "No existe selector o validador.";
+				return;
+			}
+
+			$dataToken = $this->log->BuscarTokenDeRecuperacion($selector);
+			
+			if(!$dataToken){
+				$_SESSION['password_reset_message'] = "Solicitud inválida. Por favor, vuelve a intentar el proceso de recuperación de contraseña.";
+				return;
+			}
+
+			// Compruebo expiración
+			$expires_at = strtotime($dataToken['expires_at']);
+			if($expires_at < time()){
+				$_SESSION['password_reset_message'] = "El enlace ha expirado. Por favor, inicia el proceso de recuperación nuevamente.";
+				return;
+			}
+			
+			// Revisar si ya se uso el token
+			if(isset($dataToken['used']) && intval($dataToken['used']) === 1){
+				$_SESSION['password_reset_message'] = "El enlace ya ha sido utilizado. Por favor, inicia el proceso de recuperación nuevamente.";
+				return;
+			}
+
+			// Verificar token: comparar hash de validator contra token_hash guardado
+			$tokenHash = $dataToken['token_hash'];
+			$validatorHash = hash('sha256', $validator);
+			if(!hash_equals($tokenHash, $validatorHash)){
+				$_SESSION['password_reset_message'] = "Token inválido. Por favor, inicia el proceso de recuperación nuevamente.";
+				exit;
+			}
+
+			// OK -> marcar validado en sesión y mostrar vista con formulario
+			$_SESSION['password_reset_cliente_id'] = $dataToken['cliente_id'];
+			$_SESSION['password_reset_selector'] = $selector;
+			$_SESSION['password_reset_validator'] = $validator;
+			$_SESSION['password_reset_validated'] = true;
+		}
+
 		public function verificar(){
 			$FicheroInicial = "./";
 			if(!$_POST){
 			}else{
 				$this->log->set('us_name',$_POST['us_name']);
 				$this->log->set('us_password',$_POST['us_password']);
-				echo("<br>");
-				//print_r($_SESSION);
-				echo("<br>");
 				$datos= $this->log->LoginCliente();
 				if($datos!=null){
 					if($datos['Password']!= ""){
 						if (password_verify($_POST['us_password'], $datos['Password'])) {
-							//echo 'Cliente:';
 							
 							$_SESSION['us_name'] = $datos['Alias'];
 							$_SESSION['us_password'] = $datos['Password'];
@@ -163,14 +207,14 @@
 								echo('<script>window.location.replace("' . URL . 'principal/inicio");</script>');exit;
 							}
 						}else{
-							echo "<script>alert('Contraseña incorrecta!');</script>";
+							echo "<script>const LOGIN_ERROR = {code: 401, message: 'Usuario o contraseña incorrectos.'}</script>";
 						}
 					}
 					else{
 						echo "<script>alert('Usuario incorrecto!'); </script>";
 					}
 				}else{
-					echo "<script>alert('Contraseña incorrecta!');</script>";
+					echo "<script>const LOGIN_ERROR = {code: 401, message: 'Usuario o contraseña incorrectos.'}</script>";
 				}
 			}
 		}

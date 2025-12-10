@@ -30,8 +30,7 @@ include 'Conexion.php';
 				WHERE idusuario = '{$this->idusuario}'
 			";
             $datos = $con->consultaRetorno($sql);
-			//$row = mysqli_fetch_assoc($datos);
-			//return $datos;
+
 			return $datos;
 		}
 		
@@ -49,16 +48,7 @@ include 'Conexion.php';
 			}
 			
 			$sql = "SELECT * FROM usuario WHERE us_name = '{$this->us_name}' AND us_password = '{$this->us_password}'";//
-			/*$sql = "
-				SELECT u.*, m.Nombre as 'NombreDeMenu', m.URL as 'URL', MainMenu as 'MainMenu'
-				FROM sispoc5_correoflash.usuario as u
-				INNER JOIN sispoc5_correoflash.menudeusuarios as mdu on u.idusuario = mdu.IdUsuario
-				INNER JOIN sispoc5_correoflash.menu as m on mdu.IdMenu = m.id
-				WHERE
-				u.us_name = '{$this->us_name}'
-				AND u.us_password = '{$this->us_password}'
-			";//
-			*/
+
             $datos = $con->consultaRetorno($sql);
 			$row = mysqli_fetch_assoc($datos);
 			if($row == null){
@@ -74,25 +64,47 @@ include 'Conexion.php';
 		}
 		public function LoginCliente(){
             $con = new Conexion();
-			$sql = "
-				SELECT *
-				FROM cliente
-				WHERE
-				Alias = '{$this->us_name}'
-			";
+			$sql = "SELECT * FROM cliente WHERE Alias = '{$this->us_name}'";
             $datos = $con->consultaRetorno($sql);
 			$row = mysqli_fetch_assoc($datos);
-			//print_r($row);
-			/*
 			
-			
-			$sql = "SELECT * FROM usuario WHERE us_name = '{$this->us_name}' AND us_password = '{$this->us_password}'";
-			
-            $datos = $con->consultaRetorno($sql);
-			$row = mysqli_fetch_assoc($datos);
-			//return $datos;
-			*/
 			return $row;
+		}
+
+		public function GetClientePorEmail($email){
+			$con = new Conexion();
+			$sql = "SELECT * FROM cliente WHERE Mail = '{$email}' ";
+			$datos = $con->consultaRetorno($sql);
+			$row = mysqli_fetch_assoc($datos);
+			return $row;
+		}
+
+		public function GuardarTokenDeRecuperacion($id, $selector, $token_hash, $expires_at){
+			$con = new Conexion();
+			$sql = "INSERT INTO password_resets (cliente_id, selector, token_hash, expires_at) VALUES ('{$id}', '{$selector}', '{$token_hash}', '{$expires_at}')";
+			$con->consultaSimple($sql);
+		}
+
+		public function BuscarTokenDeRecuperacion($selector){
+			$con = new Conexion();
+			$sql = " SELECT * FROM password_resets WHERE selector = '{$selector}' ";
+			$datos = $con->consultaRetorno($sql);
+			$row = mysqli_fetch_assoc($datos);
+			return $row;
+		}
+
+		public function ActualizarPasswordCliente($cliente_id, $passwordPlain){
+			$con = new Conexion();
+			$hash = password_hash($passwordPlain, PASSWORD_DEFAULT);
+			$sql = "UPDATE cliente SET Password = '{$hash}' WHERE Id = '{$cliente_id}'";
+			$con->consultaSimple($sql);
+		}
+
+		public function MarcarTokenComoUsado($selector){
+			$con = new Conexion();
+			// Intentar marcar used si existe la columna, si no eliminar el registro
+			$sql = "UPDATE password_resets SET used = 1 WHERE selector = '{$selector}'";
+			$con->consultaSimple($sql);
 		}
 		
         public function MenuDeUsuario(){
@@ -113,17 +125,7 @@ include 'Conexion.php';
 		}
 		public function MenuDeCiente(){
             $con = new Conexion();
-			//$sql = "SELECT * FROM usuario WHERE us_name = '{$this->us_name}' AND us_password = '{$this->us_password}'";//
-			
-			/*
-				SELECT c.*, m.Nombre as 'NombreDeMenu', m.URL as 'URL', MainMenu as 'MainMenu'
-				FROM sispoc5_correoflash.cliente as c
-				INNER JOIN sispoc5_correoflash.menudeusuarios as mdu on c.Id = mdu.IdUsuario
-				INNER JOIN sispoc5_correoflash.menu as m on mdu.IdMenu = m.id
-				WHERE
-				c.Id = '{$this->idusuario}'
-				and mdu.TipoDeLogueo = '1'
-			*/
+
 			$sql = "
 				SELECT c.*, m.Nombre as 'NombreDeMenu', m.URL as 'URL', MainMenu as 'MainMenu'
 				FROM sispoc5_correoflash.cliente as c
@@ -131,9 +133,8 @@ include 'Conexion.php';
 				INNER JOIN sispoc5_correoflash.menu as m on mdg.Menu = m.id
 				WHERE
 				c.Id = '{$this->idusuario}'
-			";//
+			";
             $datos = $con->consultaRetorno($sql);
-			//$row = mysqli_fetch_assoc($datos);
 			return $datos;
 		}
 		

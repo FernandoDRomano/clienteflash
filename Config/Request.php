@@ -19,27 +19,22 @@
 			
 			if(isset($_GET['url'])){
 				$ruta = filter_input(INPUT_GET, 'url', FILTER_SANITIZE_URL);
-				//print_r($ruta);print_r("<br>");
-				/*
-				if(strpos($_GET['url'], "ErrorSql.php") !== false){
-					$_GET['url'] = "ErrorSql.php";
-					echo($_GET['url']);
-				}
-				*/
+
 				$ruta = CarpetasDeURLAArrayd($ruta);
 				$buscar = ["verificar","menu"];
 				$Encontrados =  array_intersect($ruta, $buscar);
 				$PrimeraRuta = array_shift($ruta);
-				/*
-				$FicherosDeMenues = ["","log","principal","consultasdeclientes","testselect","paneldeinformacion","testtabla","testgrafica","testvaloraelemento","bancomacro"];
-				global $Perfil;
-				if($Perfil == 1){
-					$MenuesPorFichero = ["","","Views/menu.php","Views/menu.php","Views/menu.php","Views/menu.php","Views/menu.php","Views/menu.php","Views/menu.php","Views/menu.php"];
-				}else{
-					$MenuesPorFichero = ["","","Views/menuAdmin.php","Views/menuAdmin.php","Views/menuAdmin.php","Views/menuAdmin.php","Views/menuAdmin.php","Views/menuAdmin.php","Views/menuAdmin.php","Views/menuAdmin.php"];
-				}
+
+				/* 
+					Si la primera ruta es reset.php, entonces setear controlador y metodo para cambiar_password_cliente,
+					ya que reset.php no está en la base de datos de menús y es el único caso especial para cambiar la contraseña del cliente.
 				*/
-				//print_r($_SESSION);
+				if($PrimeraRuta == 'reset.php'){
+					$this->controlador = "log";
+					$this->metodo = "cambiar_password_cliente";
+					$this->JsDeMenu = ucfirst(strtolower($this->controlador)) . "/" . "Ajax" . ucfirst(strtolower($this->metodo));
+					return;
+				}
 				
 				if( !isset($_SESSION['UsuarioMainMenu']) and isset($_COOKIE['UsuarioMainMenu']) ){
 					if(isset($_COOKIE['us_name'])){$_SESSION['us_name'] = $_COOKIE["us_name"];}
@@ -52,11 +47,7 @@
 					if(isset($_COOKIE['UsuarioMainMenu'])){$_SESSION['UsuarioMainMenu'] = explode("&",$_COOKIE["UsuarioMainMenu"]);}
 					if(isset($_COOKIE['UsuarioURL'])){$_SESSION['UsuarioURL'] = explode("&",$_COOKIE["UsuarioURL"]);}
 				}
-				/*
-					print_r($_SESSION['UsuarioURL']);
-					print_r($_COOKIE['UsuarioURL']);
-					return;
-				*/
+
 				if( isset($_COOKIE["UsuarioURL"]) ){
 				    if(isset($_COOKIE['UsuarioMainMenu'])){$_SESSION['UsuarioMainMenu'] = explode("&",$_COOKIE["UsuarioMainMenu"]);}
 				    if(isset($_COOKIE['UsuarioURL'])){$_SESSION['UsuarioURL'] = explode("&",$_COOKIE["UsuarioURL"]);}
@@ -64,13 +55,7 @@
 				
 				if(isset($_SESSION['UsuarioMainMenu'])){
 					$MenuesPorFichero = $_SESSION['UsuarioMainMenu'];
-					//print_r($MenuesPorFichero);
-				}else{
-					//print_r("else _SESSION['UsuarioMainMenu'] <br>");
-					//print_r($_SESSION);
-					//print_r($_COOKIE);
-					//exit;
-					
+				}else{	
 					echo('<script>window.location.replace(URLJS);</script>');exit;exit;
 				}
 				if(isset($_SESSION['UsuarioURL'])){
@@ -78,15 +63,8 @@
 				}else{
 					echo('<script>window.location.replace(URLJS);</script>');exit;exit;
 				}
-				/*
-				$MenuesPorFichero = $_SESSION['UsuarioMainMenu'];
-				$FicherosDeMenues = $_SESSION['UsuarioURL'];
-				*/
-				//print_r($PrimeraRuta);
-				//print_r($FicherosDeMenues);
-					//print_r($_SESSION);
-					//print_r($_COOKIE);
-				if(array_search($PrimeraRuta, $FicherosDeMenues) !== false or $_SESSION['idusuario'] == 1){
+				
+				if(array_search($PrimeraRuta, $FicherosDeMenues) !== false || $_SESSION['idusuario'] == 1){
 					$this->Menu = $MenuesPorFichero[array_search($PrimeraRuta, $FicherosDeMenues)];
 				}else{
 				    /*elimino modulo firework*/
