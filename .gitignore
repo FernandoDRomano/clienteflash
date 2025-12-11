@@ -4,3 +4,7 @@ XMLHttpRequest/FirmasDeClientes/uploads/
 cliente_flash_reportes/files/
 # Ignorar carpetas temporales de sesiones
 tmp/
+# Ignorar archivos .env
+.env
+# Ignorar dependencias de composer
+vendor/
