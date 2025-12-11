@@ -6,6 +6,14 @@
 			$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 			// safeLoad evita excepción si no existe .env en producción
 			$dotenv->safeLoad();
+
+			// Asegurar que getenv() vea las variables cuando PHP corre bajo Apache.
+			// Dotenv suele poblar \\$_ENV y \\$_SERVER y de esta manera promovemos esas entradas a putenv().
+			foreach ($_ENV as $k => $v) {
+				if ($v === null) continue;
+				putenv($k . '=' . $v);
+				$_SERVER[$k] = $v;
+			}
 		}
 	}
 
