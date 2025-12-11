@@ -3,20 +3,27 @@
 	private $con;
 	public function __construct(){
 		if(!isset($this->con)){
-			
-			$PCname=gethostname();
-			//if($PCname=="RuGedit-PC"){
-			if($PCname=="Ruben-"){
-				$this->con = mysqli_connect("localhost", "root", "", "sispoc5_correoflash")
-				//$this->con = mysqli_connect("sispo.com.ar", "sispoc5_zonif", "sispoZonificacion2017", "sispoc5_zonificacion")
-				or die('No pudo conectarse: ' . \mysqli_error($this->con));
-				mysqli_query($this->con,"set names 'utf8';");
-			}else{
-				$this->con = mysqli_connect("sispo.com.ar", "sispoc5_zonif", "sispoZonificacion2017", "sispoc5_correoflash")
-				//$this->con = mysqli_connect("sispo.com.ar", "sispoc5_zonif", "sispoZonificacion2017", "sispoc5_zonificacion")
-				or die('No pudo conectarse: (' . \mysqli_error($this->con) .\mysqli_connect_error($this->con) .')');
-				mysqli_query($this->con,"set names 'utf8';");
+			$dbHost = getenv('DB_HOST');
+			$dbUser = getenv('DB_USERNAME');
+			$dbPass = getenv('DB_PASSWORD');
+			$dbName = getenv('DB_DATABASE');
+			$dbPort = getenv('DB_PORT');
+
+			if (!$dbHost) {
+				die('No pudo conectarse: (DB_HOST vacío)');
 			}
+
+			if ($dbPort) {
+				$this->con = mysqli_connect($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
+			} else {
+				$this->con = mysqli_connect($dbHost, $dbUser, $dbPass, $dbName);
+			}
+
+			if (!$this->con) {
+				die('No pudo conectarse: (' . $dbHost . ') ' . mysqli_connect_error());
+			}
+
+			mysqli_query($this->con, "set names 'utf8';");
 		}
 	}
 	public function consultaSimple($sql){
