@@ -7,6 +7,9 @@ ini_set('display_errors', 0); // Desactivar para evitar que se imprima antes de 
 ini_set('display_startup_errors', 0);
 error_reporting(E_ERROR | E_WARNING); // Solo errores críticos, no notices
 
+// Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
+require_once __DIR__ . '/../Config/bootstrap.php';
+
 require_once("FuncionesGenerales.php");
 
 // Registrar autoload para cargar clases en namespace (Models, Config, etc.)
