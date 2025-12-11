@@ -1,0 +1,14 @@
+{
+  "name": "clienteflash/app",
+  "description": "ClienteFlash application",
+  "require": {
+    "vlucas/phpdotenv": "^5.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Models\\": "Models/",
+      "Controllers\\": "Controllers/",
+      "Config\\": "Config/"
+    }
+  }
+}

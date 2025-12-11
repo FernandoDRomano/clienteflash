@@ -1,5 +1,15 @@
 <?php
-    session_save_path('tmp');
+	// Cargar autoload de Composer y .env si está instalado (vlucas/phpdotenv)
+	if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+		require_once __DIR__ . '/vendor/autoload.php';
+		if (class_exists(\Dotenv\Dotenv::class)) {
+			$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+			// safeLoad evita excepción si no existe .env en producción
+			$dotenv->safeLoad();
+		}
+	}
+
+	session_save_path($_ENV['SESSION_SAVE_PATH'] ?? 'tmp');
     
 	$currentCookieParams = session_get_cookie_params();
 	$rootDomain = "http://$_SERVER[HTTP_HOST]";
