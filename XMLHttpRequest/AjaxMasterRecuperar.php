@@ -6,6 +6,9 @@
 	date_default_timezone_set("America/Argentina/Tucuman");
 
 	require_once("FuncionesGenerales.php");
+
+	// Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
+	require_once __DIR__ . '/../Config/bootstrap.php';
 	
 	$Email = md5(issetornull('Email'));
 	$OriginalEmail=issetornull('Email');
@@ -64,16 +67,16 @@
 		$mail->IsSMTP();
 		$mail->SMTPDebug=0; // Desactivar debug en producción (usar 2 para debug)
 		$mail->SMTPAuth=true;
-		$mail->SMTPSecure='tls';
-		$mail->Host="smtp.gmail.com";
-		$mail->Port=587;
+		$mail->SMTPSecure= getenv('MAIL_ENCRYPTION');
+		$mail->Host= getenv('MAIL_HOST');
+		$mail->Port= getenv('MAIL_PORT');
 		$mail->Timeout = 10;
 		$mail->IsHTML(true);
 		$mail->CharSet='UTF-8';
 		$mail->Encoding='quoted-printable';
-		$mail->Username="correo.flash.mail@gmail.com"; 
-		$mail->Password="qprdelceuvlxjazw"; 
-		$mail->SetFrom("correo.flash.mail@gmail.com", 'Soporte Correoflash Offline', 0);
+		$mail->Username= getenv('MAIL_USERNAME'); 
+		$mail->Password= getenv('MAIL_PASSWORD'); 
+		$mail->SetFrom( getenv('MAIL_USERNAME'), getenv('MAIL_FROM'), 0);
 		$subject = "Restablecer tu contraseña";
 		$mail->Subject = html_entity_decode($subject);
 		$mail->Body    = $text;
