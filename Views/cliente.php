@@ -1,16 +1,13 @@
 <?php namespace Views;
 	use Config\Elementos as Elementos;
 	$template = new Template();
-	//require (__ROOT__.'/PHPMailer/Exception.php');
 	if (file_exists('Config/Elementos.php')){
 		require_once('Config/Elementos.php');
-		//echo('Config/Elementos.php Existe');
 	}else{
 		
 		echo('Config/Elementos.php No Existe');
 	}
 	
-	//require_once (__ROOT__.'Config/Elementos.php');
 	class Template{
 	public function __construct(){
 ?>
@@ -45,45 +42,35 @@
 	$time = time();
 	$NoMemory = strtotime(date("Ymdhis"));
 	
-	/*
-	session_start([
-		'cookie_lifetime' => 86400,
-		'read_and_close'  => true,
-	]);
-	if(issetsessionornull('UserId')==''){
-		header('Location: http://sispo.com.ar/consultas/logueo.php');
-		echo("Main MSJ 38");
-		exit;
-	}
-	$UserId = issetsessionornull('UserId');
-	if(issetsessionornull('UserId')=='1'){
-	}
-	*/
 	if(isset($_SESSION['idusuario'])){
 		$UserId = $_SESSION['idusuario'];
-		//$IdUsuarioSpp = $_SESSION['idusuario'];
-	}else{
-		//echo('<script>window.location.replace(URLJS);</script>');exit;exit;
 	}
 	$Usuario = "" ;
 	if(isset($_SESSION['ClienteId'])){
 		$Usuario = $_SESSION['ClienteId'] ;
-		//$IdClienteSpp = $_SESSION['ClienteId'];
-		//echo('<script>window.location.replace(URLJS);</script>');exit;exit;
 	}else{
 		$Usuario = "Correoflash" ;
 	}
-	//echo($Usuario);
 	
 	$PermisosFicherosDeMenues = $_SESSION['UsuarioURL'];
-	//echo($UserId);
-	
-	
-	//print_r($_SESSION);
+
+    /*
+        Funcion para determinar que menu esta activo en base a la url
+    */
+    function estaElMenuActivo($urlDelMenu){
+        $rutaActual = $_SERVER['REQUEST_URI'];
+        $partesRuta = explode('/', $rutaActual);
+        foreach ($partesRuta as $parte) {
+            if ($parte === $urlDelMenu) {
+                return true;
+            }
+        }
+        return false;
+    }
 ?>
 <script>
-	var UserId = <?php echo(json_encode($UserId));?>;
-	var permisos = <?php echo(json_encode($PermisosFicherosDeMenues));?>
+	var UserId = <?= (json_encode($UserId));?>;
+	var permisos = <?= (json_encode($PermisosFicherosDeMenues));?>
 </script>
 
 <!DOCTYPE html>
@@ -94,71 +81,34 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="">
 		<meta name="author" content="">
-		<title>Correoflash</title>
-
-        <!-- 
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/ImputUploads.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/SubaDeImagenes.css">
-		
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/Mouse.css" rel="stylesheet">
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/select2.min.css" rel="stylesheet">
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/loading.css" type="text/css">
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/table.css" type="text/css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/Menu.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/bootstrap.min.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/csstips.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/Form.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/Map.css">
-		
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/assets/global/plugins/font-awesome/css/font-awesome.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/assets/global/css/componentsARG.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/assets/global/css/DivsBolivia.css">
-		
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/XLSX.css">
-		
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/fileUpload.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/Francisco.css">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/assets/global/css/components.css" rel="stylesheet" id="style_components" type="text/css">
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/css.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/TablaYColapsable.css">
-
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/FranciscoMenu.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/FranciscoFontawesome.css">
-		<link href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/bancomacro.css" rel="stylesheet">
-		<link type="text/css" rel="stylesheet" charset="UTF-8" href="https://translate.googleapis.com/translate_static/css/translateelement.css">
-		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/Ruben.css">
-		
-		<script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/jquery.min.js"></script>
-        -->
+		<title>Dashboard | Clientes</title>
 
         <!-- ESTILOS 2.0 -->
-        <!-- Google Font: Source Sans Pro -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
         <!-- Font Awesome -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/fontawesome-free/css/all.min.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/fontawesome-free/css/all.min.css">
         <!-- Theme style -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/css/adminlte.min.css">
+        <link rel="stylesheet" href="/Styles/recursos/css/adminlte.min.css">
         <!-- overlayScrollbars -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
         <!-- pickadate.js -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/pickadate.js/css/default.css">
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/pickadate.js/css/default.date.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/pickadate.js/css/default.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/pickadate.js/css/default.date.css">
         <!-- DataTable -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/DataTables/datatables.min.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/DataTables/datatables.min.css">
         <!-- SELECT2 -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/select2/css/select2.min.css">
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/Styles/recursos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
         <!-- style owner -->
-        <link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/css/style.css">
+        <link rel="stylesheet" href="/Styles/recursos/css/style.css">
+        <!-- Sprite SVG Icons -->
+        
 		<!-- FIN ESTILOS 2.0 -->
 
 		<script>
-			var time=<?php echo json_encode($time); ?>;
-			var NoMemory = <?php echo json_encode($NoMemory); ?>;
-			var UserId = <?php echo json_encode($UserId); ?>;
+			var time=<?=  json_encode($time); ?>;
+			var NoMemory = <?=  json_encode($NoMemory); ?>;
+			var UserId = <?=  json_encode($UserId); ?>;
 		</script>
-
 	</head>
 
 	<div id="loading" name="loading" style="display:none">
@@ -167,27 +117,41 @@
 
     <!--  BODY 2.0 -->
     <body class="hold-transition sidebar-mini layout-fixed" id="body">
-        
-        <!--
-        <div id="PanelDeEscondibles"></div>
-        -->
-        
+
         <div class="wrapper">
 
             <!-- Navbar -->
-            <nav class="main-header navbar navbar-expand bg-principal navbar-light">
+            <nav class="main-header navbar navbar-expand bg-principal px-md-4 px-lg-5 d-flex justify-content-between align-items-center">
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a id="btnMenu" class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars text-white"></i></a>
+                    <li class="nav-item mr-md-4 mr-lg-0 d-lg-none">
+                        <a id="btnMenu" class="nav-link" data-widget="pushmenu" href="#" role="button">
+                            <svg width="24" height="24">
+                                <use xlink:href="/Styles/inicio/sprite.svg#bars"></use>
+                            </svg>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <img src="/Styles/inicio/logo-flash.svg" alt="Logo Empresa" class="img-logo-navbar">
+                    </li>
+                    <li class="nav-item d-none d-lg-flex justify-content-center align-items-center">
+                        <span class="text-plataforma">Plataforma para Clientes</span>
                     </li>
                 </ul>
 
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav">
+                    <li class="nav-item mr-3 d-flex justify-content-center align-items-center gap-2">
+                        <svg width="16" height="16">
+                            <use xlink:href="/Styles/inicio/sprite.svg#user"></use>
+                        </svg>
+                        <span class="d-inline nav-user ml-1"><?php global $NombreDeUsuario; echo($NombreDeUsuario); ?></span>
+                    </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");}?>" role="button">
-                            Cerrar Sesión <span class="d-none d-sm-inline">(<?php global $NombreDeUsuario; echo($NombreDeUsuario); ?>)</span>
-                            <i class="fas fa-sign-out-alt text-white"></i>
+                        <a class="btn-logout" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");}?>" role="button">
+                            Cerrar Sesi&oacute;n
+                            <svg width="16" height="16">
+                                <use xlink:href="/Styles/inicio/sprite.svg#logout"></use>
+                            </svg>
                         </a>
                     </li>
                 </ul>
@@ -196,143 +160,130 @@
             <!-- /.navbar -->
 
             <!-- Main Sidebar Container -->
-            <aside class="main-sidebar bg-principal elevation-4">
-                <!-- Brand Logo -->
-                <a href="index3.html" class="brand-link" id="logo">
-                <span id="logoGrande">
-                    <img src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/img/logo.png" alt="Logo correo flash" class="h-100 d-block m-auto">
-                </span>
-                <span id="logoChico" class="d-none">
-                    <img src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/img/logo.png" alt="Logo correo flash" class="h-100 d-block m-auto">
-                </span>
-                </a>
+            <aside class="main-sidebar bg-principal">
+                <div class="nav-header">
+                    <p class="p-0 m-0">Men&uacute;</p>
+                    <svg class="d-none d-lg-block" width="24" height="24" data-widget="pushmenu" role="button">
+                        <use xlink:href="/Styles/inicio/sprite.svg#bars"></use>
+                    </svg>
+                </div>
 
                 <!-- Sidebar -->
                 <div class="sidebar">
-                <!-- Sidebar user panel (optional) 
-                <div class="user-panel mt-3 pb-3 d-flex justify-content-center">
-                    <div class="info">
-                    <p class="text-white font-weight-bold mb-0 text-center">Usuario del sistema</p>
-                    </div>
-                </div>
-                -->
-
-                <!-- Sidebar Menu -->
-                <nav class="border-top">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Add icons to the links using the .nav-icon class
-                        with font-awesome or any other icon font library -->
-                    
-                    <li class="nav-header">MENU</li>
-                    <li class="nav-item">
-                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>principal/inicio" class="nav-link">
-                            <i class="nav-icon fas fa-home"></i>
-                            <p>
-                                Inicio
-                            </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-mail-bulk"></i>
-                            <p>
-                                Solicitud de Envio
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumento" class="nav-link">
-                                    <i class="fas fa-file-alt"></i>
-                                    <p>Carta Documento</p>
+                    <!-- Sidebar Menu -->
+                    <nav class="border-top">
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                            <li class="nav-item <?= estaElMenuActivo('principal') ? 'menu-activo' : '' ?>">
+                                <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>principal/inicio" class="nav-link">
+                                    <svg width="24" height="24">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#home"></use>
+                                    </svg>
+                                    <p>Inicio</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumentomasivo" class="nav-link">
-                                    <i class="fas fa-file-alt"></i>
-                                    <p>Carta Documento Masivo</p>
+
+                            <li class="nav-item <?= estaElMenuActivo('pedidodeenvio') ? 'menu-activo' : '' ?>">
+                                <a href="#" class="nav-link">
+                                    <svg width="24" height="24">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#envelopes"></use>
+                                    </svg>
+                                    <p>Solicitud de envio</p>
+                                    <svg width="14" height="14" class="arrow">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#chevron-down"></use>
+                                    </svg>
                                 </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumento" class="nav-link">
+                                            <svg width="24" height="24">
+                                                <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
+                                            </svg>
+                                            <p>Carta documento</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumentomasivo" class="nav-link">
+                                            <svg width="24" height="24">
+                                                <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
+                                            </svg>
+                                            <p>Carta documento masiva</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
+
+                            <li class="nav-item <?= estaElMenuActivo('clientepiezassolicitadas') ? 'menu-activo' : '' ?>">
+                                <a href="#" class="nav-link">
+                                    <svg width="24" height="24">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#box-archive"></use>
+                                    </svg>
+                                    <p>Piezas solicitadas</p>
+                                    <svg width="14" height="14" class="arrow">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#chevron-down"></use>
+                                    </svg>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>clientepiezassolicitadas/estados" class="nav-link">
+                                            <svg width="24" height="24">
+                                                <use xlink:href="/Styles/inicio/sprite.svg#box-archive"></use>
+                                            </svg>
+                                            <p>Piezas y estados de piezas</p>
+                                        </a>
+                                    </li>
+        
+                                </ul>
+                            </li>
+                            
+                            <li class="nav-item <?= estaElMenuActivo('clienteruteoservicios') ? 'menu-activo' : '' ?>">
+                                <a href="#" class="nav-link">
+                                    <svg width="24" height="24">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#location"></use>
+                                    </svg>
+                                    <p>Ruteo</p>
+                                    <svg width="14" height="14" class="arrow">
+                                        <use xlink:href="/Styles/inicio/sprite.svg#chevron-down"></use>
+                                    </svg>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>clienteruteoservicios/circulacion" class="nav-link">
+                                            <svg width="24" height="24">
+                                                <use xlink:href="/Styles/inicio/sprite.svg#location"></use>
+                                            </svg>
+                                            <p>Circulaci&oacute;n</p>
+                                        </a>
+                                    </li>
+        
+                                </ul>
+                            </li>                    
                         </ul>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-archive"></i>
-                            <p>
-                                Piezas Solicitadas
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>clientepiezassolicitadas/estados" class="nav-link">
-                                    <i class="fas fa-box"></i>
-                                    <p>Piezas y Estados de Piezas</p>
-                                </a>
-                            </li>
-  
-                        </ul>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-archive"></i>
-                            <p>
-                                Ruteo
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>clienteruteoservicios/circulacion" class="nav-link">
-                                    <i class="fas fa-box"></i>
-                                    <p>Circulacion</p>
-                                </a>
-                            </li>
-  
-                        </ul>
-                    </li>                    
-                    
-
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
+                    </nav>
+                    <!-- /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>
 
             <!-- Content Wrapper. CONTENIDO PRINCIPAL DE LA PAGINA -->
             <div class="content-wrapper altura-wrapper-auto">
-                <!-- Content Header (Page header) 
-                <div class="content-header">
-                    <div class="container-fluid">
-                        <div class="row justify-content-center">
-
-                        </div>
-                    </div>
-                </div>
-                 -->
-
                 <!-- Main content -->
                 <section class="content">
                    
                     <!-- CONTENIDO INSERTADO DE LA PÁGINA -->
-                    <div class="container-fluid" id="ForInner">
+                    <div class="container-fluid contenido-principal" id="ForInner">
                         
                     </div><!-- /.container-fluid -->
                     <!-- FINAL DEL CONTENIDO INSERTADO DE LA PÁGINA -->
                
                 </section>
                 <!-- /.content -->
-            
             </div>
             <!-- /.content-wrapper -->
 
             <footer class="main-footer footer text-white bg-principal text-center text-md-left text-sm mt-5">
-                <strong>Copyright &copy; 2022 Correo Flash.</strong>
-                <br class="d-md-none"> Todos los derechos reservados.
+                <p>
+                    Copyright &copy; 2022 Correo Flash. Todos los derechos reservados.
+                </p>
             </footer>
 
         </div>
@@ -344,18 +295,9 @@
 
 <?php }}?>
 
-
-
-
-<!--
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
--->
 <script lang="javascript" src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/Rugedit.js"></script>
 <script lang="javascript" src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/dist/xlsx.full.min.js"></script>
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/jquery.min.js"></script>
-<!--
-<script src="<?php echo URL; ?>Js/JsRu.js"></script>
--->
 
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/Flame/FlameBase.js"></script>
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/Flame/FlameSelect.js"></script>
@@ -409,13 +351,8 @@
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/highcharts.js"></script>
 
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/Barcode.js"></script>
-<!--
-<script src="< ?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ? >Js/BarcodePre.js"></script>
--->
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/JsBarcode.code39.min.js"></script>
-<!-- <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/jspdf.js"></script> -->
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/jspdf.debug.js"></script>
-<!-- <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/jspdf.min.js"></script> -->
 <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Js/jspdf.plugin.autotable.js"></script>
 
 
@@ -430,11 +367,6 @@
 
 
 <!-- SCRIPTS 2.0 -->
-
-    <!-- jQuery  
-    <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/jquery/jquery.min.js"></script>
-     -->
-   
     <!-- jQuery UI 1.11.4 -->
     <script src="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/recursos/plugins/jquery-ui/jquery-ui.min.js"></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
