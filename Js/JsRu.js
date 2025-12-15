@@ -4442,45 +4442,45 @@
 	
 	var CountLoading = 0 ;
 	var TotalDeConsultas = 0;
-	function Loading(){
-		CountLoading ++;
-		setVisible('#loading', true);
-		if(CountLoading > 1){
-			var loadingText = document.getElementById("loadingText");
-			//loadingText.innerHTML = "Faltan " + CountLoading + " Consultas";
-			if(TotalDeConsultas > 0){
-				loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";//, "  + CountLoading + " Transacciones Completadas De " + TotalDeConsultas + "";
-			}else{
-				loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";
-			}
-		}
-	}
+	// function Loading(){
+	// 	CountLoading ++;
+	// 	setVisible('#loading', true);
+	// 	if(CountLoading > 1){
+	// 		var loadingText = document.getElementById("loadingText");
+	// 		//loadingText.innerHTML = "Faltan " + CountLoading + " Consultas";
+	// 		if(TotalDeConsultas > 0){
+	// 			loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";//, "  + CountLoading + " Transacciones Completadas De " + TotalDeConsultas + "";
+	// 		}else{
+	// 			loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";
+	// 		}
+	// 	}
+	// }
 	
-	function EndLoading(){
-		CountLoading--;
-		if(CountLoading <= 0){
-			$('#loading').children('.progress').remove();
-			setVisible('#loading', false);
-			TotalDeConsultas = 0;
-			CountLoading = 0;
-		}else{
-			if(CountLoading == 1){
-				var loadingText = document.getElementById("loadingText");
-				//loadingText.innerHTML = "Falta " + CountLoading + " Consulta";
-				loadingText.innerHTML = "Transaccion En Curso, Aguarde Un Instante";
-			}else{
-				var loadingText = document.getElementById("loadingText");
-				//loadingText.innerHTML = "Faltan " + CountLoading + " Consultas";
-				if(TotalDeConsultas > 0){
-					loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";//, "  + CountLoading + " Transacciones Completadas De " + TotalDeConsultas + "";
-				}else{
-					loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";
-				}
+	// function EndLoading(){
+	// 	CountLoading--;
+	// 	if(CountLoading <= 0){
+	// 		$('#loading').children('.progress').remove();
+	// 		setVisible('#loading', false);
+	// 		TotalDeConsultas = 0;
+	// 		CountLoading = 0;
+	// 	}else{
+	// 		if(CountLoading == 1){
+	// 			var loadingText = document.getElementById("loadingText");
+	// 			//loadingText.innerHTML = "Falta " + CountLoading + " Consulta";
+	// 			loadingText.innerHTML = "Transaccion En Curso, Aguarde Un Instante";
+	// 		}else{
+	// 			var loadingText = document.getElementById("loadingText");
+	// 			//loadingText.innerHTML = "Faltan " + CountLoading + " Consultas";
+	// 			if(TotalDeConsultas > 0){
+	// 				loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";//, "  + CountLoading + " Transacciones Completadas De " + TotalDeConsultas + "";
+	// 			}else{
+	// 				loadingText.innerHTML = "Transacciones En Curso, Aguarde Un Instante";
+	// 			}
 				
-			}
-		}
+	// 		}
+	// 	}
 		
-	}
+	// }
 	
 	var Directorio = "Img";
 	var NombreAnterior="";

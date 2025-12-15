@@ -131,20 +131,6 @@ body {
   min-height: auto !important;
 }
 
-#loading {
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10062;
-  width: 100vw;
-  height: 100vh;
-  background-color: #00a98654;
-  background-image: url("cargando.gif");
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
 .alert-centrado {
   position: fixed;
   z-index: 2;

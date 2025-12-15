@@ -101,6 +101,10 @@
         <!-- style owner -->
         <link rel="stylesheet" href="/Styles/recursos/css/style.css">
         <!-- Sprite SVG Icons -->
+
+        <!-- Loading -->
+        <link href="/Styles/Styles/loading.css" rel="stylesheet" type="text/css">
+        <script src="/Js/loading.js"></script>
         
 		<!-- FIN ESTILOS 2.0 -->
 
@@ -111,9 +115,11 @@
 		</script>
 	</head>
 
-	<div id="loading" name="loading" style="display:none">
+	<!-- <div id="loading" name="loading" style="display:none">
 		<b id="loadingText" style="color: white;text-shadow: 4px 4px 8px #000000;"></b>
-	</div>
+	</div> -->
+
+    <div id="loading" name="loading" style="display:none"></div>
 
     <!--  BODY 2.0 -->
     <body class="hold-transition sidebar-mini layout-fixed" id="body">
