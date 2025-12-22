@@ -96,6 +96,7 @@
 							$_SESSION['us_nombre'] = $datos['Nombre'];
 							$_SESSION['us_apellido'] = $datos['NombreDeFantacia'];
 							$_SESSION['idperfil'] = $datos['idperfil'];
+							$_SESSION['cliente_id'] = $datos['SispoId'];
 							$_SESSION['Actividad'] = time();
 							
 							$this->log->set('idusuario',$datos['Id']);
