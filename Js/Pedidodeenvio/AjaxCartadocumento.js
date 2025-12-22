@@ -1,4 +1,5 @@
     jQuery(document).ready(function() {
+		document.title = "Carta Documento | Clientes";
         const selectElement = document.querySelector('#custom-select-input');
         selectElement.addEventListener('change',function(){
             if(this.value == "Crea/Edita tus Plantillas"){
