@@ -221,9 +221,67 @@
 		document.execCommand("insertHTML", false, text);
 	});
 	
+	async function cargarSelectRemitenteProvincia(){
+		Loading()
+		document.getElementById("RemitenteProvincia").disabled = true
+
+		try {
+			filtro=["IdUsuario","User","time"];
+			filtroX=[UserId,"","0"];
+			var Parametros = ArraydsAJson(filtro,filtroX);
+			Parametros = JSON.stringify(Parametros);// Manda Como Texto
 	
+			var Config = JSON.parse(`
+			{
+				"SelectId":"RemitenteProvincia",
+				"DataAjax":` + Parametros + `,
+				"ValoresDirectos":null,
+				"MensajeEnFail":"true",
+				"TextoEnFail":"No Se Encontraron Resultados Para Seleccionar",
+				"Ajax":"` + URLJS + `XMLHttpRequest/ParaSelects/AjaxProvincias.php"
+			}`);
 	
+			console.log("Cargando RemitenteProvincia...");
+			await SelectDesdeConsulta(Config);
+		} catch (error) {
+			console.log("Error:", error);
+		} finally{
+			document.getElementById("RemitenteProvincia").disabled = false
+			EndLoading();
+		}
+
+	}
+
+	async function cargarSelectDestinatarioProvincia(){
+		Loading()
+		document.getElementById("DestinatarioProvincia").disabled = true
+		try {			
+			filtro=["IdUsuario","User","time","Id"];
+			filtroX=[UserId,"","0","24"];
+			var Parametros = ArraydsAJson(filtro,filtroX);
+			Parametros = JSON.stringify(Parametros);// Manda Como Texto
+			
+			var Config = JSON.parse(`
+			{
+				"SelectId":"DestinatarioProvincia",
+				"DataAjax":` + Parametros + `,
+				"ValoresDirectos":null,
+				"MensajeEnFail":"true",
+				"TextoEnFail":"No Se Encontraron Resultados Para Seleccionar",
+				"Ajax":"` + URLJS + `XMLHttpRequest/ParaSelects/AjaxProvincias.php"
+			}`);
+
+			await SelectDesdeConsulta(Config);
+		} catch (error) {
+			console.log("Error:", error);
+		} finally {
+			document.getElementById("DestinatarioProvincia").disabled = false 
+			EndLoading();
+		}
+	}
 	
+	cargarSelectRemitenteProvincia();
+	cargarSelectDestinatarioProvincia();
 	
 	
 	
@@ -284,6 +342,14 @@
 			const conf = confirm("Una vez confirmada la Carta Documento los datos contenidos en la misma no podrán modificarse. Controle antes de confirmar su envío ya que luego no se podrán hacer reclamos al correo por datos incorrectos o inexistentes");
 		    if(conf){
 		        EnviarCartaDoccumento(this)
+		    }
+		    
+		});
+
+		$("#EntrarAModalGuardarCD").on("click", function () {
+			const conf = confirm("Una vez confirmada la Carta Documento los datos contenidos en la misma no podrán modificarse. Controle antes de confirmar su envío ya que luego no se podrán hacer reclamos al correo por datos incorrectos o inexistentes");
+		    if(conf){
+		        GuardarCartaDocumento(this)
 		    }
 		    
 		});
@@ -358,52 +424,6 @@
 		});
 		
 	});
-	
-	filtro=["IdUsuario","User","time"];
-	filtroX=[UserId,"","0"];
-	var Parametros = ArraydsAJson(filtro,filtroX);
-	Parametros = JSON.stringify(Parametros);// Manda Como Texto
-	/*
-	var Indices=["FechaI","FechaF"];
-	var Objetos = ["FechaI","FechaF"];
-	var ValoresDirectos = ArraydsAJson(Indices,Objetos);//Manda Como Objeto En SelectDesdeConsulta Se Transforma En Terxto
-	*/
-	var Config = JSON.parse(`
-	{
-		"SelectId":"RemitenteProvincia",
-		"DataAjax":` + Parametros + `,
-		"ValoresDirectos":null,
-		"MensajeEnFail":"true",
-		"TextoEnFail":"No Se Encontraron Resultados Para Seleccionar",
-		"Ajax":"` + URLJS + `XMLHttpRequest/ParaSelects/AjaxProvincias.php"
-	}`);
-	//"ValoresDirectos":null,
-	//"ValoresDirectos":` + ValoresDirectos + `,
-	SelectDesdeConsulta(Config);
-	
-	
-	filtro=["IdUsuario","User","time","Id"];
-	filtroX=[UserId,"","0","24"];
-	var Parametros = ArraydsAJson(filtro,filtroX);
-	Parametros = JSON.stringify(Parametros);// Manda Como Texto
-	/*
-	var Indices=["FechaI","FechaF"];
-	var Objetos = ["FechaI","FechaF"];
-	var ValoresDirectos = ArraydsAJson(Indices,Objetos);//Manda Como Objeto En SelectDesdeConsulta Se Transforma En Terxto
-	*/
-	var Config = JSON.parse(`
-	{
-		"SelectId":"DestinatarioProvincia",
-		"DataAjax":` + Parametros + `,
-		"ValoresDirectos":null,
-		"MensajeEnFail":"true",
-		"TextoEnFail":"No Se Encontraron Resultados Para Seleccionar",
-		"Ajax":"` + URLJS + `XMLHttpRequest/ParaSelects/AjaxProvincias.php"
-	}`);
-	//"ValoresDirectos":null,
-	//"ValoresDirectos":` + ValoresDirectos + `,
-	SelectDesdeConsulta(Config);
-	
 	
 
 jQuery(document).ready(function() {
@@ -582,6 +602,102 @@ function EnviarCartaDoccumento(e){
 	//"ValoresDirectos":` + ValoresDirectos + `,
 	ValoresAElementos(Config);
 	//ValorDesdeConsulta(Config);
+}
+
+function GuardarCartaDocumento(e){	
+	if(! Needed("DestinatarioNombre","1")){return;}
+	if(! Needed("DestinatarioApellido","1")){return;}
+	if(! Needed("DestinatarioProvincia","1")){return;}
+	if(! Needed("DestinatarioLocalidad","1")){return;}
+	if(! Needed("DestinatarioCodigoPostal","4")){return;}
+	if(! Needed("DestinatarioCalle","1")){return;}
+	if(! Needed("DestinatarioNumero","1")){return;}
+	
+	if(! Needed("RemitenteNombre","1")){return;}
+	if(! Needed("RemitenteCalle","1")){return;}
+	if(! Needed("RemitenteNumero","1")){return;}
+	if(! Needed("RemitenteProvincia","1")){return;}
+	if(! Needed("RemitenteLocalidad","1")){return;}
+	if(! Needed("RemitenteCodigoPostal","4")){return;}
+	if(! Needed("RemitenteEmail","1")){return;}
+	if(! Needed("RemitenteCelular","14")){return;}
+	
+	if(! Needed("RemitenteNombreApoderado","1")){return;}
+	if(! Needed("RemitenteApellidoApoderado","1")){return;}
+	if(! Needed("RemitenteDNITipoApoderado","1")){return;}
+	if(! Needed("RemitenteDocumentoApoderado","1")){return;}
+	
+	var FirmaSeleccionada = document.getElementsByName("image0")[0];
+	if(FirmaSeleccionada == undefined){
+		var Firma = URLJS +"XMLHttpRequest/FirmasDeClientes/uploads/null.png";
+		filtro=["IdUsuario","User","time"];
+		filtroX=[UserId,"","0"];
+		var Parametros = ArraydsAJson(filtro,filtroX);
+		Parametros = JSON.stringify(Parametros);
+		var Config = JSON.parse(`
+		{
+			"DataAjax":` + Parametros + `,
+			"ValoresDirectos":null,
+			"MensajeEnFail":false,
+			"TextoEnFail":"",
+			"Ajax":"` + URLJS + `XMLHttpRequest/FirmasDeClientes/AjaxPonerFirmaDeUsuario.php"
+		}`);
+		//alert(URLJS);
+		SyncObtenerValorDeConsulta(Config);
+	}
+
+	const perfilId = $('#perfilId').val();
+	const sispoClienteId = $('#sispoClienteId').val();
+
+	filtro=["IdUsuario","User","time","servicio_id","perfilId","sispoClienteId"];
+	filtroX=[UserId,"","0","33", perfilId, sispoClienteId];
+	var Parametros = ArraydsAJson(filtro,filtroX);
+	Parametros = JSON.stringify(Parametros);// Manda Como Texto
+	
+	var Indices=[
+		"textBox"
+	];
+	
+	var Objetos=[
+		"textBox"
+	];
+	var ValoresDirectos = ArraydsAJson(Indices,Objetos);//Manda Como Objeto En SelectDesdeConsulta Se Transforma En Terxto
+		
+	var ArraydJsonPostTitulo = "Piezas";
+	var Indices=[
+		"DestinatarioNombre","DestinatarioApellido","DestinatarioCodigoPostal","DestinatarioProvincia","DestinatarioLocalidad",,"DestinatarioCalle","DestinatarioNumero","DestinatarioPiso","DestinatarioDepartamento"
+		,"RemitenteNombre","RemitenteNombreApoderado","RemitenteApellidoApoderado","RemitenteDNITipoApoderado","RemitenteDocumentoApoderado"
+		,"RemitenteCodigoPostal","RemitenteProvincia","RemitenteLocalidad","RemitenteCalle","RemitenteNumero","RemitentePiso","RemitenteDepartamento"
+		,"RemitenteEmail","RemitenteCelular","RemitenteObservaciones"
+	];
+	var Objetos = [
+		"DestinatarioNombre","DestinatarioApellido","DestinatarioCodigoPostal","DestinatarioProvincia","DestinatarioLocalidad",,"DestinatarioCalle","DestinatarioNumero","DestinatarioPiso","DestinatarioDepartamento"
+		,"RemitenteNombre","RemitenteNombreApoderado","RemitenteApellidoApoderado","RemitenteDNITipoApoderado","RemitenteDocumentoApoderado"
+		,"RemitenteCodigoPostal","RemitenteProvincia","RemitenteLocalidad","RemitenteCalle","RemitenteNumero","RemitentePiso","RemitenteDepartamento"
+		,"RemitenteEmail","RemitenteCelular","RemitenteObservaciones"
+	];
+	var ArraydJsonPost = ArraydsAJson(Indices,Objetos);//Manda Como Objeto En SelectDesdeConsulta Se Transforma En Terxto
+	
+	var Elementos=[""];
+	Elementos = JSON.stringify(Elementos);
+	
+	
+	var Config = JSON.parse(`
+	{
+		"Elemento":"Estado",
+		"ArraydJsonPostTitulo":"` + ArraydJsonPostTitulo + `",
+		"ArraydJsonPost":` + ArraydJsonPost + `,
+		
+		"Elementos":` + Elementos + `,
+		"DataAjax":` + Parametros + `,
+		"ValoresDirectos":` + ValoresDirectos + `,
+		"MensajeEnFail":false,
+		"TextoEnFail":"No Se Encontraron Resultados",
+		"ValorDefault":"0",
+		"Ajax":"` + URLJS + `XMLHttpRequest/PedidoDeEnvio/AjaxGuardarCartaDocumento.php"
+	}`);
+
+	ValoresAElementos(Config);
 }
 
 

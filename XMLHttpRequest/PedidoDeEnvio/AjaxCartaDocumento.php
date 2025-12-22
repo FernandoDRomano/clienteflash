@@ -63,55 +63,6 @@
 	
 	$horaPasada = date("Y-m-d H:i:s", strtotime('2020-02-25 00:00:00'));
 	$HoraBusqueda = date('Y-m-d H:i:s', strtotime($horaPasada. $DiferenciaHoraria));
-	/*
-	$RespuestaJsonAjax = functionRespuestaJsonAjax("Api Iniciada",$RespuestaJsonAjax);
-	if($RespuestaJsonAjax[0] == ""){
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-	}
-	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
-	*/
-	
-	/*
-	$ApiKey = issetornull('ApiKey');
-	$SecretKey = issetornull('SecretKey');
-	$AccessToken = issetornull('AccessToken');
-	
-	$Data = array('api-key' => $ApiKey,'secret-key' => $SecretKey);
-	$PHPRespuesta = CURL("POST", "https://clientes.sispo.com.ar/api/tokens", $Data);
-	if($PHPRespuesta["http_code"] == 200){
-		if(isset($PHPRespuesta["json-data"])){
-			//echo("Error:Sin Datos De Respuesta");
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Sin Datos De Respuesta",$RespuestaJsonAjax);
-			if($RespuestaJsonAjax[0] == ""){
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-			}
-			functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-		}else{
-			if(isset($PHPRespuesta["access_token"])){
-				$AccessToken = $PHPRespuesta["access_token"];
-			}else{
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Con Datos Erroneos",$RespuestaJsonAjax);
-				if($RespuestaJsonAjax[0] == ""){
-					$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-				}
-				functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-			}
-		}
-	}else{
-		if(isset($PHPRespuesta["json-data"])){
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Sin Datos De Respuesta",$RespuestaJsonAjax);
-			if($RespuestaJsonAjax[0] == ""){
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-			}
-			functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-		}
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Inesperado",$RespuestaJsonAjax);
-		if($RespuestaJsonAjax[0] == ""){
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-		}
-		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	}
-	*/
 	
 	$ServicioId = issetornull('servicio_id');
 	$ServicioId = "4477";//4477 4050
@@ -172,13 +123,6 @@
 		if($piso != "" and $depto != ""){$Domicilio = $calle . " " .  $numero . " " . $piso . " " . $depto;}
 		if($piso != "" and $depto == ""){$Domicilio = $calle . " " .  $numero . " " . $piso;}
 		if($piso == "" and $depto == ""){$Domicilio = $calle . " " .  $numero;}
-		
-		
-		/*
-    	if($IdUsuario=="12"){
-    	    $Destinatario="0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
-    	}
-    	*/
     	
 		//Pieza
 		if(strlen($Destinatario)>150){
@@ -335,33 +279,6 @@
 		}
 		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
 	}
-	
-	
-	/*
-	$Columnas = array("id");
-	$Consulta="
-		SELECT flash_clientes_api.cliente_id as 'id'
-		FROM sispoc5_gestionpostal.flash_clientes_api_tokens 
-		INNER JOIN sispoc5_gestionpostal.flash_clientes_api ON (flash_clientes_api.id = flash_clientes_api_tokens.flash_cliente_api_id) 
-		WHERE flash_clientes_api_tokens.access_token = '" . $AccessToken . "'
-		AND TIMESTAMPDIFF(HOUR, flash_clientes_api_tokens.create, NOW()) < 5
-		limit 1
-	";
-	$Resultado = $ClaseMaster->SQL_Master($Consulta,$Columnas,$time,true);
-	$cliente_id="";
-	if($Resultado){
-		$cliente_id = $ClaseMaster->ArraydResultados[0][0];
-		$RespuestaJsonAjax = functionRespuestaJsonAjax($cliente_id,$RespuestaJsonAjax);
-	}else{
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Periodo De Pedidos Terminado Autorice Nuevamente(" . $Consulta . ")",$RespuestaJsonAjax);
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Periodo De Pedidos Terminado Autorice Nuevamente Su Cuenta",$RespuestaJsonAjax);
-		if($RespuestaJsonAjax[0] == ""){
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-		}
-		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	}
-	*/
-	
 	
 	//Cansulta Para Error 4
 	$Columnas = array("id");
@@ -840,76 +757,5 @@
 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 	}
 	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	
-	
-	
-	/*
-	$EmailDeCliente = $EmailDeCliente. "correflash2017@gmail.com,operaciones@correoflash.com,despachos2@correoflash.com,auditoria@correoflash.com";//$_POST['us_mail'];
-    $mail = new PHPMailer(true);
-	try {
-		//Server settings
-		$mail->SMTPDebug = 0;                      //3 Enable verbose debug output
-		$mail->isSMTP();                                            // Send using SMTP
-		$mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
-		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		$mail->Username   = 'correoflash2020@gmail.com';                     // SMTP username (Aceptar app insegura en configuracion de mail.)
-		$mail->Password   = 'Rugedit32Ruben';                               // SMTP password
-		$mail->SMTPSecure = 'tls';         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-		$mail->Port       = 587;                                    // TCP port to connect to
 
-		//Recipients
-		$mail->setFrom('correflash2017@gmail.com', 'CorreoFlash');
-		
-		$Emails = explode( ',', $EmailDeCliente);
-		for($i=0;$i<count($Emails);$i++){
-			$mail->addAddress($Emails[$i]);     // Add a recipient
-		}
-
-		// Content
-		$mail->isHTML(true);                                  // Set email format to HTML
-		$mail->Subject = 'Su Envio De Carta Documento';
-		$mail->Body    = 'Un Cliente Solicita Carta Documento: <br>Con Comprobante De Ingreso:(' . $ComprobanteDeIngreso . ')'.
-		'';
-		$mail->send();
-		//echo 'Message has been sent';
-	} catch (Exception $e) {
-		$RespuestaJsonAjax = array('');
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Pudo Enviar Mail Con El Estado Del Pedido",$RespuestaJsonAjax);
-		if($RespuestaJsonAjax[0] == ""){
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-		}
-		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	}
-	*/
-	
-/*	
-	print_r($_REQUEST);
-	exit;
-*/
-	/*
-	
-	
-	
-	
-	if($RespuestaJsonAjax[0] == ""){
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-	}
-	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	*/
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

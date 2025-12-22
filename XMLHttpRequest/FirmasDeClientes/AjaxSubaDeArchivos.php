@@ -151,8 +151,11 @@
 	}
 	//F Suba De Imagenes Si Existen
 	
-	
-	
+	// Validar que se subió el archivo antes de actualizar BD
+	if(empty($BaseFileName)){
+		echo("Error: No se pudo subir la imagen.");
+		exit;
+	}
 	
 	//I Variables
 	$UserId = issetornull('UserId');
