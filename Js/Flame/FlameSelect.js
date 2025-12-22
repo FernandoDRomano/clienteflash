@@ -27,7 +27,7 @@ SelectDesdeConsulta(Config);
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function SelectDesdeConsulta(Config){//Funcion De Auto Completado De Elemento Select
+async function SelectDesdeConsulta(Config){//Funcion De Auto Completado De Elemento Select
 	//console.log("FlameSelectJs: ", Config)
 	
 	var x = document.getElementById(Config.SelectId);
@@ -40,12 +40,13 @@ function SelectDesdeConsulta(Config){//Funcion De Auto Completado De Elemento Se
 				width: 'auto'
 			});
 		}
-		return;
+		return Promise.reject("El elemento no existe");
 	}
 	Loading();
+	
+	var PostData = {};
 	if(Config.ValoresDirectos != null){
 		var jsonValoresDirectos = JsonElementosAJsonValores(Config.ValoresDirectos);//JsonElementosAJsonValores FlameBase
-		var PostData = {};
 		//console.log( JSON.parse(jsonValoresDirectos));
 		//console.log( JSON.parse(Config.DataAjax));
 		PostData = jsonConcat(PostData, JSON.parse(jsonValoresDirectos));//jsonConcat FlameBase
@@ -53,78 +54,83 @@ function SelectDesdeConsulta(Config){//Funcion De Auto Completado De Elemento Se
 		//console.log(jsonValoresDirectos);
 		//console.log(PostData);
 	}else{
-		var PostData = {};
 		PostData = jsonConcat(PostData, JSON.parse(Config.DataAjax));
 		//console.log(PostData);
 	}
-	$.ajax({
-		type:"GET",
-		url:Config.Ajax,
-		data: PostData,
-		success:function(Resultado){
-			//console.log(Resultado);
-			
-			var Resultado = Resultado.trim();
-			if(Resultado=="NULL" || Resultado=="" || ( Resultado.indexOf("Error:") == 0 ) ){
-				LimpiarSelect(Config);
-				if(Config.MensajeEnFail){
+	
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type:"GET",
+			url:Config.Ajax,
+			data: PostData,
+			success:function(Resultado){
+				//console.log(Resultado);
+				
+				var Resultado = Resultado.trim();
+				if(Resultado=="NULL" || Resultado=="" || ( Resultado.indexOf("Error:") == 0 ) ){
+					LimpiarSelect(Config);
+					if(Config.MensajeEnFail){
+						if(typeof $.bootstrapGrowl === "function") {
+							$.bootstrapGrowl(Config.TextoEnFail,{
+								type: 'danger',
+								align: 'center',
+								width: 'auto'
+							});
+						}
+					}
+					if((Resultado.indexOf("Error:") == 0) ){
+						//alert(Resultado.indexOf("Error:"));
+						Resultado = Resultado.replace("Error:", "");
+						//alert(Resultado);
+						if(typeof $.bootstrapGrowl === "function") {
+							$.bootstrapGrowl(Resultado,{
+								type: 'danger',
+								align: 'center',
+								width: 'auto'
+							});
+						}
+					}
+					EndLoading();
+					reject(Resultado);
+				}else{
+					AderirOpcionesDeSelectDesdeArrayd(StringAArrayd2d(Resultado),Config);
+					EndLoading();
+					resolve(Resultado);
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (XMLHttpRequest.readyState == 4) {
 					if(typeof $.bootstrapGrowl === "function") {
-						$.bootstrapGrowl(Config.TextoEnFail,{
+						$.bootstrapGrowl("Error-" + XMLHttpRequest.status + " (" + XMLHttpRequest.statusText + ")",{
 							type: 'danger',
 							align: 'center',
 							width: 'auto'
 						});
 					}
-				}
-				if((Resultado.indexOf("Error:") == 0) ){
-					//alert(Resultado.indexOf("Error:"));
-					Resultado = Resultado.replace("Error:", "");
-					//alert(Resultado);
-					if(typeof $.bootstrapGrowl === "function") {
-						$.bootstrapGrowl(Resultado,{
-							type: 'danger',
-							align: 'center',
-							width: 'auto'
-						});
+					EndLoading();
+					reject(errorThrown);
+				}else{
+					if (XMLHttpRequest.readyState == 0) {
+						
+						if(typeof $.bootstrapGrowl === "function") {
+							$.bootstrapGrowl("Sin Coneccion A Internet Reintentando Conectar",{
+								type: 'danger',
+								align: 'center',
+								width: 'auto'
+							});
+						}
+						
+						$.ajax(this);
+						console.clear();
+						return;
+					}
+					else {
 					}
 				}
-				EndLoading();
-			}else{
-				AderirOpcionesDeSelectDesdeArrayd(StringAArrayd2d(Resultado),Config);
-				EndLoading();
-			}
-		},
-		error: function(XMLHttpRequest, textStatus, errorThrown) {
-			if (XMLHttpRequest.readyState == 4) {
-				if(typeof $.bootstrapGrowl === "function") {
-					$.bootstrapGrowl("Error-" + XMLHttpRequest.status + " (" + XMLHttpRequest.statusText + ")",{
-						type: 'danger',
-						align: 'center',
-						width: 'auto'
-					});
-				}
-				EndLoading();
-			}else{
-				if (XMLHttpRequest.readyState == 0) {
-					
-					if(typeof $.bootstrapGrowl === "function") {
-						$.bootstrapGrowl("Sin Coneccion A Internet Reintentando Conectar",{
-							type: 'danger',
-							align: 'center',
-							width: 'auto'
-						});
-					}
-					
-					$.ajax(this);
-					console.clear();
-					return;
-				}
-				else {
-				}
-			}
-		},
-		dataType: "text" // El tipo de datos esperados del servidor. Valor predeterminado: Intelligent Guess (xml, json, script, text, html).
-	})
+			},
+			dataType: "text" // El tipo de datos esperados del servidor. Valor predeterminado: Intelligent Guess (xml, json, script, text, html).
+		});
+	});
 }
 function StringAArrayd2d(String){
 	if(String!=false && String!=undefined){
