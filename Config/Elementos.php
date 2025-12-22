@@ -85,10 +85,10 @@
 		}
 		
 		
-		public static function StartFormFile($Tamaño, $URL){
+		public static function StartFormFile($Tamaño, $URL, $clases = ""){
 			echo('
 			<div class="col-sm-' . $Tamaño . '">
-				<form  class="SubaDeImagenes" method="post" enctype="multipart/form-data" action="' . $URL . '">
+				<form  class="SubaDeImagenes ' . $clases . '" method="post" enctype="multipart/form-data" action="' . $URL . '">
 			');
 		}
 		
