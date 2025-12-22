@@ -6,7 +6,8 @@
     
 	$currentCookieParams = session_get_cookie_params();
 	$rootDomain = "http://$_SERVER[HTTP_HOST]";
-	define('CARPETABASEURL', "https://$_SERVER[HTTP_HOST]");
+	$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+	define('CARPETABASEURL', "$protocol://$_SERVER[HTTP_HOST]");
 	session_set_cookie_params(
 		$currentCookieParams["lifetime"],
 		$currentCookieParams["path"],
