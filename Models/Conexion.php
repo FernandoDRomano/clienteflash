@@ -44,5 +44,14 @@
 			return $datos;
 		}
 	}
+	public function insertar($sql){
+		$resultado = mysqli_query($this->con, $sql);
+		if(!$resultado){
+			echo '<strong>¡Error!</strong> <br>'. mysqli_error($this->con). '<br>'. $sql . '<br>';
+			echo '<a href="'.URL.'principal/buscar">VOLVER</a>';
+			exit();
+		}
+		return mysqli_insert_id($this->con);
+	}
 }
 ?>
