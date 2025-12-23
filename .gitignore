@@ -8,3 +8,5 @@ tmp/
 .env
 # Ignorar dependencias de composer
 vendor/
+# Ignorar logs de carta documento
+logs/
