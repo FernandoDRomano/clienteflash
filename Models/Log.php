@@ -1,5 +1,6 @@
 <?php namespace Models;
 include 'Conexion.php';
+include 'ConexionSispo.php';
 	class Log{
             private $us_name;
 			private $us_password;
@@ -69,6 +70,15 @@ include 'Conexion.php';
 			$row = mysqli_fetch_assoc($datos);
 			
 			return $row;
+		}
+
+		public function ClienteActivoEnSispo($idSispo){
+			$con = new ConexionSispo();
+			$sql = "SELECT * FROM flash_clientes WHERE id = '{$idSispo}' AND cliente_estado_id = 1 ";
+			$datos = $con->consultaRetorno($sql);
+			$row = mysqli_fetch_assoc($datos);
+
+			return count($row) > 0;
 		}
 
 		public function GetClientePorEmail($email){

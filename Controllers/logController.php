@@ -87,6 +87,12 @@
 				$this->log->set('us_password',$_POST['us_password']);
 				$datos= $this->log->LoginCliente();
 				if($datos!=null){
+
+					if($this->log->ClienteActivoEnSispo($datos['SispoId'])== false){
+						echo "<script>const LOGIN_ERROR = {code: 403, message: 'Su cuenta esta inactiva. Comuniquese con el comercial asignado a su cuenta.'}</script>";
+						return;
+					}
+
 					if($datos['Password']!= ""){
 						if (password_verify($_POST['us_password'], $datos['Password'])) {
 							

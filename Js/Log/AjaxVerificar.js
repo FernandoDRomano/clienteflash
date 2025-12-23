@@ -73,7 +73,8 @@ function GoUrl(url){
 }
 
 // Mostrar mensaje de error si existe desde el servidor
-if(typeof LOGIN_ERROR !== 'undefined' && LOGIN_ERROR.code === 401) {
+const CODIGOS_ERROR_LOGIN = [401, 403];
+if(typeof LOGIN_ERROR !== 'undefined' && CODIGOS_ERROR_LOGIN.includes(LOGIN_ERROR.code)) { //LOGIN_ERROR.code === 401
 	document.getElementById('login-error-mensaje').innerText = LOGIN_ERROR.message;
 	document.getElementById('login-error-mensaje').classList.remove('d-none');
 }
