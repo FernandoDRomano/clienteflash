@@ -83,11 +83,6 @@
     $PerfilId = issetornull('perfilId');
     $SispoClienteId = issetornull('sispoClienteId');
 
-    // Debug: Log de variables recibidas
-    error_log("DEBUG Ajax - PerfilId: " . var_export($PerfilId, true));
-    error_log("DEBUG Ajax - SispoClienteId: " . var_export($SispoClienteId, true));
-    error_log("DEBUG Ajax - IdUsuario: " . var_export(issetornull('IdUsuario'), true));
-
 
     //VALIDAR QUE EL USUARIO TENGA EL PERFIL PARA GUARDAR
     if($PerfilId != PerfilCliente::CREADOR){
