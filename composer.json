@@ -8,7 +8,8 @@
     "psr-4": {
       "Models\\": "Models/",
       "Controllers\\": "Controllers/",
-      "Config\\": "Config/"
+      "Config\\": "Config/",
+      "Helpers\\": "Helpers/"
     }
   }
 }
