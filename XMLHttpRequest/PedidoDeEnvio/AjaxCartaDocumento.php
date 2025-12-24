@@ -1,11 +1,45 @@
 <?php
 	header("Access-Control-Allow-Origin: *");
-	//header("Access-Control-Allow-Credentials: true");
-	//header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT, DELETE");
-	//header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	//header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+	
+	// Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
+	require_once __DIR__ . '/../../Config/bootstrap.php';
+
+	use Helpers\LogManager;
+
 	$RespuestaJsonAjax = array('');
 	$_REQUEST = json_decode($_REQUEST["js"],true);
+
+	// Instanciar LogManager
+	$logger = new LogManager();
+	$logger->info('Inicio de AjaxCartaDocumento', 'Procesando carta documento', [
+		'request' => $_REQUEST
+	]);
+	
+	function MSJDeErroresParaMostrar($Columna,$Valor,$Long,$Pedido){
+		$logger = new LogManager();
+		$logger->error('Error de validación de campo', 'El campo ' . $Columna . ' contiene ' . strlen($Valor) . ' dígitos, el máximo admitido es ' . $Long, [
+			'columna' => $Columna,
+			'valor' => $Valor,
+			'longitud_maxima' => $Long,
+			'pedido_numero' => $Pedido
+		]);
+
+	    if($Pedido>0){
+        	$RespuestaJsonAjax = array('');
+        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>" . "<p>Verifique El Pedido Numero (<b>" .$Pedido . "</b>) Dentro Del Excel</p>", $RespuestaJsonAjax);
+        	if($RespuestaJsonAjax[0] == ""){
+        		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+        	}
+        	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
+	    }else{
+	        $RespuestaJsonAjax = array('');
+        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>", $RespuestaJsonAjax);
+        	if($RespuestaJsonAjax[0] == ""){
+        		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+        	}
+        	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
+	    }
+	}
 	function functionRespuestaJsonAjax($String,$RespuestaJsonAjax){
 		if($RespuestaJsonAjax['0'] == ""){
 			$RespuestaJsonAjax['0'] = $RespuestaJsonAjax['0'] . $String;
@@ -29,6 +63,7 @@
 		}
 		exit;
 	}
+
 	require('../FuncionesGenerales.php');
 	InluirPHP('../clases/ClaseMaster.php','1');//Tendria Que Entrar Por Config.php
 	require('../config.php');
@@ -38,26 +73,6 @@
 		exit;
 	}
 	require('../FuncionesHorarias.php');
-	
-	
-	
-	function MSJDeErroresParaMostrar($Columna,$Valor,$Long,$Pedido){
-	    if($Pedido>0){
-        	$RespuestaJsonAjax = array('');
-        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>" . "<p>Verifique El Pedido Numero (<b>" .$Pedido . "</b>) Dentro Del Ecxel</p>" . $Consulta,$RespuestaJsonAjax);
-        	if($RespuestaJsonAjax[0] == ""){
-        		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-        	}
-        	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
-	    }else{
-	        $RespuestaJsonAjax = array('');
-        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>". $Consulta,$RespuestaJsonAjax);
-        	if($RespuestaJsonAjax[0] == ""){
-        		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-        	}
-        	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
-	    }
-	}
 	
 	
 	
@@ -229,7 +244,6 @@
 		$GPIdUsuario = $ClaseMaster->ArraydResultados[0][0];
 		$_REQUEST["GPIdUsuario"]= $GPIdUsuario;
 	}else{
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Periodo De Pedidos Terminado Autorice Nuevamente(" . $Consulta . ")",$RespuestaJsonAjax);
 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Cliente No Encntrado",$RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
@@ -248,7 +262,6 @@
 		$FirmaDelCliente = $ClaseMaster->ArraydResultados[0][0];
 		$_REQUEST["FirmaDelCliente"]= $FirmaDelCliente;
 	}else{
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Periodo De Pedidos Terminado Autorice Nuevamente(" . $Consulta . ")",$RespuestaJsonAjax);
 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:La Firma Requiere Ser Cargada Antes Del Pedido.",$RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
@@ -272,7 +285,6 @@
 		$_REQUEST["FirmaDelCliente"]= $FirmaDelCliente;
 	}else{
 		$EmailDeCliente = "correflash2017@gmail.com";
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Periodo De Pedidos Terminado Autorice Nuevamente(" . $Consulta . ")",$RespuestaJsonAjax);
 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:El Usuario No Tiene Agregado Un Mail."  ,$RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
@@ -293,8 +305,14 @@
 	if($Resultado){
 		$departamento_id = $ClaseMaster->ArraydResultados[0][0];
 		$_REQUEST["departamento_id"]= $departamento_id;
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("|" . $departamento_id,$RespuestaJsonAjax);
 	}else{
+		$logger->error('Error: No se encontró el departamento del cliente', [
+			'cliente_id' => $GPIdUsuario,
+			'consulta' => preg_replace('/[\r\n\t]+/', '', $Consulta),
+			'usuario_id' => $GPIdUsuario,
+			'data' => $_REQUEST
+		]);
+
 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Encontro El Departamento Del Cliente",$RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
@@ -319,7 +337,6 @@
 		goto GenerarComprobanteDeIngreso;
 	}else{
 		$ComprobanteDeIngreso = $numero;
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("|" . $ComprobanteDeIngreso,$RespuestaJsonAjax);
 		$_REQUEST["ComprobanteDeIngreso"]= $ComprobanteDeIngreso;
 	}
 	
@@ -345,11 +362,16 @@
 	$ComprobanteDeIngreso_generadoInsertado="";
 	if($Resultado){
 		$ComprobanteDeIngreso_generadoInsertado=$ClaseMaster->Insertado;
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("|" . $ComprobanteDeIngresoInsertado,$RespuestaJsonAjax);
 		$_REQUEST["ComprobanteDeIngreso_generadoInsertado"]= $ComprobanteDeIngreso_generadoInsertado;
 	}else{
+		$logger->error('Error al insertar comprobante de ingreso generado', [
+			'consulta' => preg_replace('/[\r\n\t]+/', '', $Consulta),
+			'usuario_id' => $GPIdUsuario,
+			'data' => $_REQUEST
+		]);
+
 		$RespuestaJsonAjax = array('');
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Comprobante De Ingreso" . $Consulta,$RespuestaJsonAjax);
+		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Comprobante De Ingreso", $RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 		}
@@ -390,11 +412,16 @@
 	$ComprobanteDeIngresoInsertado="";
 	if($Resultado){
 		$ComprobanteDeIngresoInsertado=$ClaseMaster->Insertado;
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("|" . $ComprobanteDeIngresoInsertado,$RespuestaJsonAjax);
 		$_REQUEST["ComprobanteDeIngresoInsertado"]= $ComprobanteDeIngresoInsertado;
 	}else{
+		$logger->error('Error al insertar comprobante de ingreso', [
+			'consulta' => preg_replace('/[\r\n\t]+/', '', $Consulta),
+			'usuario_id' => $GPIdUsuario,
+			'data' => $_REQUEST
+		]);
+
 		$RespuestaJsonAjax = array('');
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Comprobante De Ingreso" . $Consulta,$RespuestaJsonAjax);
+		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Comprobante De Ingreso", $RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 		}
@@ -430,12 +457,17 @@
 	$ComprobantesIngresosServicios="";
 	if($Resultado){
 		$ComprobantesIngresosServicios=$ClaseMaster->Insertado;
-		//$RespuestaJsonAjax = functionRespuestaJsonAjax("|" . $ComprobantesIngresosServicios,$RespuestaJsonAjax);
 		$_REQUEST["ComprobantesIngresosServicios"]= $ComprobantesIngresosServicios;
 		
 	}else{
+		$logger->error('Error al insertar comprobante de ingreso en servicio', [
+			'consulta' => preg_replace('/[\r\n\t]+/', '', $Consulta),
+			'usuario_id' => $GPIdUsuario,
+			'data' => $_REQUEST
+		]);
+
 		$RespuestaJsonAjax = array('');
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Comprobante De Ingreso En Servicio" . $Consulta,$RespuestaJsonAjax);
+		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Comprobante De Ingreso En Servicio", $RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 		}
@@ -473,13 +505,6 @@
         $piso = str_replace("'","´", $piso);
         $depto = str_replace("'","´", $depto);
 
-		
-		/*
-		$codigo_externo = issetornullinarrayd('Piezas',$i,'codigo_externo');
-		$telefono = issetornullinarrayd('Piezas',$i,'telefono');
-		$mail = issetornullinarrayd('Piezas',$i,'mail');
-		$referencia_domicilio = issetornullinarrayd('Piezas',$i,'referencia_domicilio');
-		*/
 		$Destinatario = $apellidos . " " . $nombres;
 		
 		if($piso != "" and $depto != ""){$Domicilio = $calle . " " .  $numero . " " . $piso . " " . $depto;}
@@ -530,16 +555,15 @@
 		if($Resultado){
 			$PiezaIngrezada=$ClaseMaster->Insertado;
 			$_REQUEST["PiezaIngrezada"][$i]= $PiezaIngrezada;
-			/*
-			if($i>0){
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("!" . ($i+1) . "°" . $PiezaIngrezada ,$RespuestaJsonAjax);
-			}else{
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("|TABLE:" . ($i+1) . "°" . $PiezaIngrezada,$RespuestaJsonAjax);
-			}
-			*/
 		}else{
+			$logger->error('Error al insertar pieza', [
+				'consulta' => preg_replace('/[\r\n\t]+/', '', $Consulta),
+				'usuario_id' => $GPIdUsuario,
+				'data' => $_REQUEST
+			]);
+
 			$RespuestaJsonAjax = array('');
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto La Pieza" . $Consulta,$RespuestaJsonAjax);
+			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto La Pieza", $RespuestaJsonAjax);
 			if($RespuestaJsonAjax[0] == ""){
 				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 			}
@@ -650,8 +674,14 @@
 			$_REQUEST["PiezaCDIngrezada"][$i]= $PiezaCDIngrezada;
 		}
 		else{
+			$logger->error('Error al insertar pieza cd', [
+				'consulta' => preg_replace('/[\r\n\t]+/', '', $Consulta),
+				'usuario_id' => $GPIdUsuario,
+				'data' => $_REQUEST
+			]);
+
 			$RespuestaJsonAjax = array('');
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto La Pieza CD" . $Consulta,$RespuestaJsonAjax);
+			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto La Pieza CD",$RespuestaJsonAjax);
 			if($RespuestaJsonAjax[0] == ""){
 				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 			}
@@ -659,7 +689,9 @@
 		}
 	}
 	
-	
+	$logger->info('Final de AjaxCartaDocumento', 'Se finalizó el procesamiento de carta documento', [
+		'request' => $_REQUEST
+	]);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Mensajeria Mail
@@ -675,22 +707,6 @@
 		$EmailDeCliente = $EmailDeCliente. "correflash2017@gmail.com,despachos2@correoflash.com,auditoria@correoflash.com";//$_POST['us_mail'];
 	}
 	
-	//$emailCliente = $_POST['RemitenteEmail'];
-	/*
-	
-	if($EmailDeCliente != ""){
-		$EmailDeCliente = $EmailDeCliente. "," . $emailCliente . ",correflash2017@gmail.com,operaciones@correoflash.com,despachos2@correoflash.com,auditoria@correoflash.com";//$_POST['us_mail'];
-	}else{
-		$EmailDeCliente = $EmailDeCliente. $emailCliente . "," . "correflash2017@gmail.com,operaciones@correoflash.com,despachos2@correoflash.com,auditoria@correoflash.com";//$_POST['us_mail'];
-	}*/
-	
-	/*
-	if($EmailDeCliente != ""){
-		$EmailDeCliente = $EmailDeCliente. ",correflash2017@gmail.com";//$_POST['us_mail'];
-	}else{
-		$EmailDeCliente = $EmailDeCliente. "correflash2017@gmail.com";//$_POST['us_mail'];
-	}
-	*/
 	
     $mail = new PHPMailer(true);
 	try {
@@ -699,25 +715,14 @@
 		$mail->isSMTP();                                            // Send using SMTP
 		$mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
 		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-	
-	/*
-	    ULTIMA DE RUBEN
-		$mail->Username   = 'correflash2017@gmail.com';  
-		$mail->Password   = 'RGF277627';            // SMTP username (Aceptar app insegura en configuracion de mail.)
-    */
-    
 		$mail->Username   = 'correo.flash.mail@gmail.com';                     // SMTP username (Aceptar app insegura en configuracion de mail.)
 		$mail->Password   = 'qprdelceuvlxjazw'; // vriwdufntdddazxe
-		 
-		
 		$mail->SMTPSecure = 'tls';         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
 		$mail->Port       = 587;                                    // TCP port to connect to
 
         $mail->CharSet = 'UTF-8';
 
 		//Recipients
-		//$mail->setFrom('correflash2017@gmail.com', 'CorreoFlash');
-		//$mail->setFrom('correoflash.test@gmail.com', 'CorreoFlash');
 		$mail->setFrom('correo.flash.mail@gmail.com', 'CorreoFlash');
 		
 		$Emails = explode( ',', $EmailDeCliente);
@@ -734,14 +739,14 @@
 		'<p>Email del cliente </p>' . $emailCliente .
 		'';
 		
-		/*
-		'Estimado/a: <br>Su pedido fue dado de alta. '.
-		'Para ver el estado de su Pedido consulte en su cuenta de cliente Con: Comprobante De Ingreso:(' . $ComprobanteDeIngreso . ')' .
-		'';
-		*/
 		$mail->send();
 		//echo 'Message has been sent';
 	} catch (Exception $e) {
+		$logger->exception('Error al enviar mail con el estado del pedido', $e, [
+			'usuario_id' => $GPIdUsuario,
+			'data' => $_REQUEST
+		]);
+
 		$RespuestaJsonAjax = array('');
 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Pudo Enviar Mail Con El Estado Del Pedido",$RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){

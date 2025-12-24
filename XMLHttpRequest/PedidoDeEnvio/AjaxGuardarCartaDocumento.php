@@ -6,9 +6,16 @@
 
     use Models\CartaDocumento;
     use Models\PerfilCliente;
+	use Helpers\LogManager;
 
 	$RespuestaJsonAjax = array('');
 	$_REQUEST = json_decode($_REQUEST["js"],true);
+
+	// Instanciar LogManager
+	$logger = new LogManager();
+	$logger->info('Inicio de AjaxGuardarCartaDocumento', 'Procesando solicitud de guardado de carta documento', [
+		'request' => $_REQUEST
+	]);
 	
     function functionRespuestaJsonAjax($String,$RespuestaJsonAjax){
 		if($RespuestaJsonAjax['0'] == ""){
@@ -36,16 +43,23 @@
 	}
     
     function MSJDeErroresParaMostrar($Columna,$Valor,$Long,$Pedido){
+		$logger = new LogManager();
+		$logger->error('Error de validación de campo', 'El campo ' . $Columna . ' contiene ' . strlen($Valor) . ' dígitos, el máximo admitido es ' . $Long, [
+			'columna' => $Columna,
+			'valor' => $Valor,
+			'longitud_maxima' => $Long,
+			'pedido_numero' => $Pedido
+		]);
 	    if($Pedido>0){
         	$RespuestaJsonAjax = array('');
-        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>" . "<p>Verifique El Pedido Numero (<b>" .$Pedido . "</b>) Dentro Del Ecxel</p>" . $Consulta,$RespuestaJsonAjax);
+        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>" . "<p>Verifique El Pedido Numero (<b>" .$Pedido . "</b>) Dentro Del Excel</p>", $RespuestaJsonAjax);
         	if($RespuestaJsonAjax[0] == ""){
         		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
         	}
         	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
 	    }else{
 	        $RespuestaJsonAjax = array('');
-        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>". $Consulta,$RespuestaJsonAjax);
+        	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:<p>El Campo $Columna Contiene (<b>" . strlen($Valor) . "</b> Digitos)</p><p>El Maximo Admitido Es $Long </p><p>El Data Suministrado " . $Valor . "Es Muy Largo </p>", $RespuestaJsonAjax);
         	if($RespuestaJsonAjax[0] == ""){
         		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
         	}
@@ -381,16 +395,31 @@
 
 	}
 
-    $cartaDocumento = new CartaDocumento();
-    $id = $cartaDocumento->crear($data);
+    try {
+		$cartaDocumento = new CartaDocumento();
+		$id = $cartaDocumento->crear($data);
 
-    if(!$id){
-        $RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Pudo Guardar La Carta Documento.",$RespuestaJsonAjax);
-        if($RespuestaJsonAjax[0] == ""){
-            $RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-        }
-        functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-    }
+		if(!$id){
+			$logger->error('Error al guardar la carta documento', 'No se pudo guardar la carta documento para el cliente', [
+				'data' => $data
+			]);
+		}else{
+			$logger->info('Carta documento guardada con éxito', 'La carta documento fue guardada correctamente', [
+				'carta_documento_id' => $id,
+				'data' => $data
+			]);
+		}
+	} catch (Exception $e) {
+		$logger->exception('Excepción al guardar Carta Documento', $e, [
+			'usuario_id' => $IdUsuario,
+			'data' => $data
+		]);
+		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error: No Se Pudo Guardar La Carta Documento.",$RespuestaJsonAjax);
+		if($RespuestaJsonAjax[0] == ""){
+			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+		}
+		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
+	}
 		
 	$RespuestaJsonAjax = functionRespuestaJsonAjax('<p>Estimado cliente.</p><p>Su Carta Documento fue almacenada con éxito. La misma debe ser autorizada para ser enviada a nuestro sistema POSTAL.</p>', $RespuestaJsonAjax);
 	if($RespuestaJsonAjax[0] == ""){
