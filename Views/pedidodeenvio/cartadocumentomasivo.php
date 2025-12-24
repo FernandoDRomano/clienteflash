@@ -9,7 +9,10 @@
     }
 
     use Config\Elementos as Elementos;
+	use Models\PerfilCliente;
 
+    $perfilUsuario = $_SESSION['idperfil'] ?? null;		
+    $clienteId = $_SESSION['cliente_id'] ?? null;
     ?>
 	<style>
 	    /* Always set the map height explicitly to define the size of the div
@@ -75,18 +78,6 @@
 	        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25) !important;
 	    }
 	</style>
-	<!--
-	<div id="floating-panel">
-		<input id="address" type="textbox" value="Gral Alvarez Condarco 894, Tafi Viejo, Tucuman">
-		<input id="submit" type="button" value="Geocode">
-		
-		<input id="Descargar" type="button" value="Descargar" onclick="Descargar('Forzado.txt');">
-	</div>
-	<div id="mapa"></div>
-	<script async defer
-		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVkGi-OeMDJJU7SxlHOJyom1VrND8e-M&sensor=false&amp;libraries=places">
-	</script>
-	-->
 
 	<img src="/clienteflash/XMLHttpRequest/FirmasDeClientes/uploads/IMG_20200414_120127720.jpg" id="mug" hidden />
 	<canvas id="myCanvas" width="400px" height="auto" hidden></canvas>
@@ -170,60 +161,62 @@
     ?>
 
 	<div class="row justify-content-center mt-3">
-	    <div class="col-12">
+	    <div class="col-11">
 	        <div class="card">
-	            <div class="card-header bg-principal text-white">
+	            <div class="card-header">
 	                <p class="mb-0 text-center text-lg">Envio De Carta Documento</p>
 	            </div>
 
 	            <div class="card-body">
 
-	                <h3 class="h3 text-uppercase font-weight-bold">Datos de Remitente</h3>
-	                <hr class="mt-1">
+	                <h3 class="form-titulo-seccion">Datos de Remitente</h3>
+
+					<input type="hidden" name="perfilId" id="perfilId" value="<?=  $perfilUsuario ?>">
+                	<input type="hidden" name="sispoClienteId" id="sispoClienteId" value="<?= $clienteId ?>">
 
 	                <div class="form-row">
 	                    <div class="form-group col-12">
-	                        <label for="RemitenteNombre">Apellido Nombre/Razón social <span style="color:red;">*</span></label>
+	                        <label for="RemitenteNombre">Apellido Nombre/Raz&oacute;n social <span style="color:red;">*</span></label>
 	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitenteNombre" id="RemitenteNombre" class="form-control" placeholder="Apellido Nombre/Razón social">
 	                    </div>
 	                </div>
 
-	                <div class="form-row">
-	                    <div class="form-group col-12 col-md-3">
-	                        <label for="RemitenteCalle">Calle <span style="color:red;">*</span></label>
-	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitenteCalle" id="RemitenteCalle" class="form-control" placeholder="Calle">
-	                    </div>
-
-	                    <div class="form-group col-12 col-md-3">
-	                        <label for="RemitenteNumero">Número <span style="color:red;">*</span></label>
-	                        <input onkeyup="validarLongitudes(event)" type="number" name="RemitenteNumero" id="RemitenteNumero" class="form-control" placeholder="Número">
-	                    </div>
-
-	                    <div class="form-group col-12 col-md-3">
-	                        <label for="RemitentePiso">Piso</label>
-	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitentePiso" id="RemitentePiso" class="form-control" placeholder="Piso">
-	                    </div>
-
-	                    <div class="form-group col-12 col-md-3">
-	                        <label for="RemitenteDepartamento">Departamento</label>
-	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitenteDepartamento" id="RemitenteDepartamento" class="form-control" placeholder="Departamento">
-	                    </div>
-	                </div>
-
-	                <div class="form-row">
-	                    <div class="form-group col-12 col-md-4">
+					<div class="form-row">
+	                    <div class="form-group col-12 col-md-6">
 	                        <label for="RemitenteProvincia">Provincia <span style="color:red;">*</span></label>
 	                        <select name="RemitenteProvincia" id="RemitenteProvincia" class="select-2 d-none form-control select1-Borrado  select1-hidden-accessible-Borrado"></select>
 	                    </div>
 
-	                    <div class="form-group col-12 col-md-4">
+	                    <div class="form-group col-12 col-md-3 col-lg-4">
 	                        <label for="RemitenteLocalidad">Localidad <span style="color:red;">*</span></label>
 	                        <select name="RemitenteLocalidad" id="RemitenteLocalidad" class="select-2 d-none form-control select1-Borrado  select1-hidden-accessible-Borrado"></select>
 	                    </div>
 
-	                    <div class="form-group col-12 col-md-4">
+	                    <div class="form-group col-12 col-md-3 col-lg-2">
 	                        <label for="RemitenteCodigoPostal">Codigo Postal <span style="color:red;">*</span></label>
 	                        <input onkeyup="validarLongitudes(event)" placeholder="Codigo Postal" type="text" data-inputmask="'mask': '9999'" data-mask inputmode="text" id="RemitenteCodigoPostal" name="RemitenteCodigoPostal" class="form-control">
+	                    </div>
+	                </div>
+
+	                <div class="form-row">
+	                    <div class="form-group col-12 col-md-6">
+	                        <label for="RemitenteCalle">Calle <span style="color:red;">*</span></label>
+	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitenteCalle" id="RemitenteCalle" class="form-control" placeholder="Calle">
+	                    </div>
+
+	                    <div class="form-group col-12 col-md-2">
+	                        <label for="RemitenteNumero">Número <span style="color:red;">*</span></label>
+	                        <input onkeyup="validarLongitudes(event)" type="number" name="RemitenteNumero" id="RemitenteNumero" class="form-control" placeholder="Número">
+	                    </div>
+
+	                    <div class="form-group col-12 col-md-2">
+	                        <label for="RemitentePiso">Piso</label>
+	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitentePiso" id="RemitentePiso" class="form-control" placeholder="Piso">
+	                    </div>
+
+	                    <div class="form-group col-12 col-md-2">
+	                        <label for="RemitenteDepartamento">Departamento</label>
+	                        <input onkeyup="validarLongitudes(event)" type="text" name="RemitenteDepartamento" id="RemitenteDepartamento" class="form-control" placeholder="Departamento">
 	                    </div>
 	                </div>
 
@@ -232,12 +225,7 @@
 	                        <label for="RemitenteEmail">Email <span style="color:red;">*</span></label>
 	                        <input onkeyup="validarLongitudes(event)" type="email" name="RemitenteEmail" id="RemitenteEmail" class="form-control" placeholder="@gmail.com">
 	                    </div>
-	                    <!--
-                    <div class="form-group col-12 col-md-6">
-                        <label for="RemitenteCelular">Celular <span style="color:red;">*</span> <span style="color:blue;" class="small">Codigo De Area + Numero Personal 10 Digitos</span></label>
-                        <input placeholder="Celular" type="Celular" id="RemitenteCelular" name="RemitenteCelular" class="form-control">
-                    </div>
-                    -->
+	                    
 	                    <div class="form-group col-12 col-md-6">
 	                        <label for="RemitenteCelular">Celular <span style="color:red;">*</span> <span style="color:blue;" class="small">Codigo De Area + celular sin el 15</span></label>
 	                        <div class="input-group">
@@ -256,8 +244,7 @@
 	                    </div>
 	                </div>
 
-	                <h3 class="h3 mt-4 text-uppercase font-weight-bold">Datos de Firmante</h3>
-	                <hr class="mt-1">
+	                <h3 class="form-titulo-seccion mt-5">Datos de Firmante</h3>
 
 	                <div class="form-row">
 	                    <div class="form-group col-12 col-md-6">
@@ -285,7 +272,7 @@
 	                        </div>
 	                    </div>
 
-	                    <div class="form-group col-12 col-md-8">
+	                    <div class="form-group col-12 col-md-4">
 	                        <label for="RemitenteDocumentoApoderado">Documento <span style="color:red;">*</span></label>
 	                        <input onkeyup="validarLongitudes(event)" type="number" name="RemitenteDocumentoApoderado" id="RemitenteDocumentoApoderado" class="form-control" placeholder="Documento">
 	                    </div>
@@ -300,19 +287,19 @@
 
 
 	<div class="row justify-content-center mt-3">
-	    <div class="col-12">
+	    <div class="col-11">
 	        <div class="card">
-	            <div class="card-header bg-principal text-white">
+	            <div class="card-header">
 	                <p class="mb-0 text-center text-lg">Formulario</p>
 	            </div>
 	            <div class="card-body">
 
-	                <h3 class="h3 text-uppercase font-weight-bold">Formularios Predefinidos</h3>
-	                <hr class="mt-1">
-	                <p style="font-size: 12px;margin-top: 0px;margin-bottom: 0px;color: #0000FF;">Seleccione el motivo de su carta documento, descargue y complete la plantilla para carga masiva, si quiere crear una plantilla propia seleccione la opción Crear Plantilla.</p>
+	                <h3 class="form-titulo-seccion">Formularios Predefinidos</h3>
+
+	                <p class="info-formulario">Seleccione el motivo de su carta documento, descargue y complete la plantilla para carga masiva, si quiere crear una plantilla propia seleccione la opción Crear Plantilla.</p>
 
 	                <div class="row">
-	                    <div class="col-md-12">
+	                    <div class="col-12">
 
 	                        <label for="custom-select-input"></label>
 	                        <div id='custom-select-status' class='hidden-visually' aria-live="polite"></div>
@@ -369,33 +356,33 @@
 	                            </ul>
 
 	                        </div>
-	                        <div id='PanelDeEscondibles'>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/NuevaPlantilla.xlsx" download="">
+	                        <div id='PanelDeEscondibles' style="margin-top: 1rem;">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/NuevaPlantilla.xlsx" download="">
 	                                </a>
 	                            </div>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/DespidoConCausa.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/DespidoConCausa.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
 	                                </a>
 	                            </div>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/DespidoPorAbandonoDeTrabajo.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/DespidoPorAbandonoDeTrabajo.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
 	                                </a>
 	                            </div>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/DespidoSinCausa.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/DespidoSinCausa.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
 	                                </a>
 	                            </div>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/IntimaciónADesalojoPorFinalizaciónDeLocación.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/IntimaciónADesalojoPorFinalizaciónDeLocación.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
 	                                </a>
 	                            </div>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/IntimaciónADesalojoPorIncumplimientoDeContratoDeLocación.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/IntimaciónADesalojoPorIncumplimientoDeContratoDeLocación.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
 	                                </a>
 	                            </div>
-	                            <div class="col-md-3 Escondibles" style="display:none">
-	                                <a href="../Documentos/IntimaciónARegularizarSituaciónLaboral.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
+	                            <div class="col-md-12 Escondibles" style="display:none">
+	                                <a class="archivo-excel" href="../Documentos/IntimaciónARegularizarSituaciónLaboral.xlsx" download="">Plantilla Para Este Formulario<img src="../xlsx-512.png" alt="Documento Base" width="52px">
 	                                </a>
 	                            </div>
 	                        </div>
@@ -404,9 +391,16 @@
 	                    <hr class="size2 hideline">
 
 	                    <div class="col-12">
-	                        <label for="">
-	                            <h4 class="font-weight-bold text-uppercase">Subir plantilla</h4>
-	                        </label>
+	                        <h3 class="form-titulo-seccion">Subir Plantilla</h3>
+
+							<div class="input-file-excel" id="input-file-excel">
+								<svg width="24" height="24">
+									<use xlink:href="/Styles/inicio/sprite.svg#file-download"></use>
+								</svg>
+								<h4>Elegir archivo</h4>
+								<p>No se ha seleccionado ningún archivo</p>
+							</div>
+
 	                        <?php
                             $Config->DivContenedor = "DivDestinatario";
                             $Config->ConFiltro = true;
@@ -423,11 +417,11 @@
                             ?>
 	                    </div>
 
-	                    <div class="col-md-12 p-3" style="border-color: black;border-style: double;">
+	                    <div class="col-md-12" style="">
 
-	                        <h4 class="font-weight-bold text-uppercase">Editor Manual</h4>
+	                        <h3 class="form-titulo-seccion">Editor Manual</h3>
 
-	                        <div id="toolBar2">
+	                        <div id="toolBar2" class="mb-3">
 	                            <img class="intLink" title="Borrar" onclick="if(validateMode()&amp;&amp;confirm('Quiere Reiniciar El Documento?')){oDoc.innerHTML=sDefTxt};" src="data:image/gif;base64,R0lGODlhFgAWAIQbAD04KTRLYzFRjlldZl9vj1dusY14WYODhpWIbbSVFY6O7IOXw5qbms+wUbCztca0ccS4kdDQjdTLtMrL1O3YitHa7OPcsd/f4PfvrvDv8Pv5xv///////////////////yH5BAEKAB8ALAAAAAAWABYAAAV84CeOZGmeaKqubMteyzK547QoBcFWTm/jgsHq4rhMLoxFIehQQSAWR+Z4IAyaJ0kEgtFoLIzLwRE4oCQWrxoTOTAIhMCZ0tVgMBQKZHAYyFEWEV14eQ8IflhnEHmFDQkAiSkQCI2PDC4QBg+OAJc0ewadNCOgo6anqKkoIQA7">
 	                            <img class="intLink" title="Imprimir" onclick="printDoc();" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oEBxcZFmGboiwAAAAIdEVYdENvbW1lbnQA9syWvwAAAuFJREFUOMvtlUtsjFEUx//n3nn0YdpBh1abRpt4LFqtqkc3jRKkNEIsiIRIBBEhJJpKlIVo4m1RRMKKjQiRMJRUqUdKPT71qpIpiRKPaqdF55tv5vvusZjQTjOlseUkd3Xu/3dPzusC/22wtu2wRn+jG5So/OCDh8ycMJDflehMlkJkVK7KUYN+ufzA/RttH76zaVocDptRxzQtNi3mRWuPc+6cKtlXZ/sddP2uu9uXlmYXZ6Qm8v4Tz8lhF1H+zDQXt7S8oLMXtbF4e8QaFHjj3kbP2MzkktHpiTjp9VH6iHiA+whtAsX5brpwueMGdONdf/2A4M7ukDs1JW662+XkqTkeUoqjKtOjm2h53YFL15pSJ04Zc94wdtibr26fXlC2mzRvBccEbz2kiRFD414tKMlEZbVGT33+qCoHgha81SWYsew0r1uzfNylmtpx80pngQQ91LwVk2JGvGnfvZG6YcYRAT16GFtW5kKKfo1EQLtfh5Q2etT0BIWF+aitq4fDbk+ImYo1OxvGF03waFJQvBCkvDffRyEtxQiFFYgAZTHS0zwAGD7fG5TNnYNTp8/FzvGwJOfmgG7GOx0SAKKgQgDMgKBI0NJGMEImpGDk5+WACEwEd0ywblhGUZ4Hw5OdUekRBLT7DTgdEgxACsIznx8zpmWh7k4rkpJcuHDxCul6MDsmmBXDlWCH2+XozSgBnzsNCEE4euYV4pwCpsWYPW0UHDYBKSWu1NYjENDReqtKjwn2+zvtTc1vMSTB/mvev/WEYSlASsLimcOhOBJxw+N3aP/SjefNL5GePZmpu4kG7OPr1+tOfPyUu3BecWYKcwQcDFmwFKAUo90fhKDInBCAmvqnyMgqUEagQwCoHBDc1rjv9pIlD8IbVkz6qYViIBQGTJPx4k0XpIgEZoRN1Da0cij4VfR0ta3WvBXH/rjdCufv6R2zPgPH/e4pxSBCpeatqPrjNiso203/5s/zA171Mv8+w1LOAAAAAElFTkSuQmCC">
 	                            <img class="intLink" title="Undo" onclick="formatDoc('undo');" src="data:image/gif;base64,R0lGODlhFgAWAOMKADljwliE33mOrpGjuYKl8aezxqPD+7/I19DV3NHa7P///////////////////////yH5BAEKAA8ALAAAAAAWABYAAARR8MlJq7046807TkaYeJJBnES4EeUJvIGapWYAC0CsocQ7SDlWJkAkCA6ToMYWIARGQF3mRQVIEjkkSVLIbSfEwhdRIH4fh/DZMICe3/C4nBQBADs=">
@@ -447,7 +441,6 @@
 	                            <img class="intLink" title="Cortar" onclick="formatDoc('cut');" src="data:image/gif;base64,R0lGODlhFgAWAIQSAB1ChBFNsRJTySJYwjljwkxwl19vj1dusYODhl6MnHmOrpqbmpGjuaezxrCztcDCxL/I18rL1P///////////////////////////////////////////////////////yH5BAEAAB8ALAAAAAAWABYAAAVu4CeOZGmeaKqubDs6TNnEbGNApNG0kbGMi5trwcA9GArXh+FAfBAw5UexUDAQESkRsfhJPwaH4YsEGAAJGisRGAQY7UCC9ZAXBB+74LGCRxIEHwAHdWooDgGJcwpxDisQBQRjIgkDCVlfmZqbmiEAOw==">
 	                            <img class="intLink" title="Copiar" onclick="formatDoc('copy');" src="data:image/gif;base64,R0lGODlhFgAWAIQcAB1ChBFNsTRLYyJYwjljwl9vj1iE31iGzF6MnHWX9HOdz5GjuYCl2YKl8ZOt4qezxqK63aK/9KPD+7DI3b/I17LM/MrL1MLY9NHa7OPs++bx/Pv8/f///////////////yH5BAEAAB8ALAAAAAAWABYAAAWG4CeOZGmeaKqubOum1SQ/kPVOW749BeVSus2CgrCxHptLBbOQxCSNCCaF1GUqwQbBd0JGJAyGJJiobE+LnCaDcXAaEoxhQACgNw0FQx9kP+wmaRgYFBQNeAoGihCAJQsCkJAKOhgXEw8BLQYciooHf5o7EA+kC40qBKkAAAGrpy+wsbKzIiEAOw==">
 	                            <img class="intLink" title="Pegar" onclick="formatDoc('paste');" src="data:image/gif;base64,R0lGODlhFgAWAIQUAD04KTRLY2tXQF9vj414WZWIbXmOrpqbmpGjudClFaezxsa0cb/I1+3YitHa7PrkIPHvbuPs+/fvrvv8/f///////////////////////////////////////////////yH5BAEAAB8ALAAAAAAWABYAAAWN4CeOZGmeaKqubGsusPvBSyFJjVDs6nJLB0khR4AkBCmfsCGBQAoCwjF5gwquVykSFbwZE+AwIBV0GhFog2EwIDchjwRiQo9E2Fx4XD5R+B0DDAEnBXBhBhN2DgwDAQFjJYVhCQYRfgoIDGiQJAWTCQMRiwwMfgicnVcAAAMOaK+bLAOrtLUyt7i5uiUhADs=">
-	                            <hr>
 	                        </div>
 
 	                        <form hidden name="compForm" method="post" action="sample.php" onsubmit="if(validateMode()){this.myDoc.value=oDoc.innerHTML;return true;}return false;">
@@ -467,7 +460,7 @@
 	                                border: none;
 	                            }
 	                        </style>
-	                        <div id="textBox" value="innerHTML" contenteditable="true" style="border-color: black;border-style: dotted;min-height: 279px;">
+	                        <div id="textBox" value="innerHTML" contenteditable="true" class="textBox">
 	                            <p style="font-size: 12px;"></p>
 	                        </div>
 	                    </div>
@@ -479,26 +472,27 @@
 	                </div>
 
 
-	                <h3 class="h3 text-uppercase font-weight-bold mt-4">Firma de Formulario</h3>
-	                <hr class="mt-1">
+	                <div class="">
+						 <?php
+						    
+							$clases = "d-flex flex-column flex-md-row justify-content-md-between align-items-md-end gap-3 p-0";
+							Elementos::StartFormFile('12', CARPETABASEURL . DS . SUBDOMINIO . '/XMLHttpRequest/FirmasDeClientes/AjaxSubaDeArchivos.php', $clases); //'http://localhost:8081/clienteflash/XMLHttpRequest/FirmasDeClientes/AjaxSubaDeArchivos.php'
+							//Elementos::StartFormFile('12', 'http://sispo.com.ar/clienteflash/XMLHttpRequest/FirmasDeClientes/AjaxSubaDeArchivos.php');
 
-	                <?php
+							Elementos::StartHide("");
+							Elementos::CrearImput("UserId", "text", "UserId", "6", "value='" . $UserId . "'");
+							Elementos::EndHide();
 
-                    /***************************************************/
+						?>
 
-                    Elementos::StartFormFile('12', CARPETABASEURL . DS . SUBDOMINIO . '/XMLHttpRequest/FirmasDeClientes/AjaxSubaDeArchivos.php'); //'http://localhost:8081/clienteflash/XMLHttpRequest/FirmasDeClientes/AjaxSubaDeArchivos.php'
-                    //Elementos::StartFormFile('12', 'http://sispo.com.ar/clienteflash/XMLHttpRequest/FirmasDeClientes/AjaxSubaDeArchivos.php');
-
-                    Elementos::StartHide("");
-                    Elementos::CrearImput("UserId", "text", "UserId", "6", "value='" . $UserId . "'");
-                    Elementos::EndHide();
-
-                    ?>
-
-
-	                <div class="d-flex justify-content-between align-items-center">
 	                    <div class="">
-	                        <label class="SubaDeImagenes btn btn-warning text-white" for="image_uploads" style="">Seleccione Firma Digital</label>
+							<h3 class="form-titulo-seccion mt-3">Firma de Formulario</h3>
+                            <label class="SubaDeImagenes btn btn-block btn-black mb-0" for="image_uploads">
+                                <svg width="16" height="16">
+                                    <use xlink:href="/Styles/inicio/sprite.svg#file-upload"></use>
+                                </svg>
+                                Seleccione Firma Digital 
+                            </label>
 	                        <input class="SubaDeImagenes d-none" type="file" id="image_uploads" name="image_uploads[]" accept=".png" nomultiple="">
 	                    </div>
 
@@ -522,7 +516,7 @@
 
 	                    <div class="">
 	                        <div class="span9 btn-block">
-	                            <button id="VistaPrevia" class="btn btn-primary text-white" type="button" onclick="validarVistaPrevia()">
+	                            <button id="VistaPrevia" class="btn btn-block btn-primary text-white font-weight-bold" type="button" onclick="validarVistaPrevia()">
 	                                <i class=""></i>
 	                                Cargar Vista Previa
 	                            </button>
@@ -537,14 +531,26 @@
 	</div>
 
 	<div class="row">
-	    <div class="col-md-12" style="">
-	        <div class="span9 btn-block">
-	            <button id="EntrarAModall" class="btn btn-large bg-principal text-white" type="button">
-	                <i class=""></i>
-	                Continuar Con Envio De Carta Documento
-	            </button>
-	            <div class="col-md-12" style="text-align:center; color:#0000C0; font-size:10px;"></div>
-	        </div>
+	    <div class="col-12">
+			<?php if($perfilUsuario == PerfilCliente::ADMINISTRADOR){ ?>
+                <div class="span9 btn-block">
+                    <button id="EntrarAModall" class="btn btn-large bg-success text-white" type="button">
+                        <i class=""></i>
+                        Continuar Con Envio De Carta Documento
+                    </button>
+                    <div class="col-md-12" style="text-align:center; color:#0000C0; font-size:10px;"></div>
+                </div>
+            <?php } ?>
+
+			<?php if($perfilUsuario == PerfilCliente::CREADOR){ ?>
+                <div class="span9 btn-block">
+                    <button id="EntrarAModalGuardarCD" class="btn btn-large bg-info text-white" type="button">
+                        <i class=""></i>
+                        Guardar Cartas Documentos
+                    </button>
+                    <div class="col-md-12" style="text-align:center; color:#0000C0; font-size:10px;"></div>
+                </div>
+            <?php } ?>
 	    </div>
 	</div>
 
@@ -568,11 +574,8 @@
 	    }
 	</style>
 
-	<div class="col-md-12 m-5" style="">
-	    <!--<p id="Paragrapiframe">Copia No Valida Legalmente</p>-->
-	    <iframe id="iframePDF" type="application/pdf" style="width: inherit;height:266mm;display: none;">
-	        <!---->
-	    </iframe><!--  width:279mm; height:266mm-->
+	<div class="col-11 mt-5">
+	    <iframe id="iframePDF" type="application/pdf" style="width: inherit;height:266mm;display: none;"></iframe>
 	</div>
 
 	<?php
@@ -588,157 +591,6 @@
     echo ('<hr class="size2 hideline">');
     echo ('<hr class="size2 hideline">');
     ?>
-
-	<style>
-	    body {
-	        font-family: sans-serif;
-	        background: #eeeeee;
-	    }
-
-	    .wrapper {
-	        margin: 1em auto;
-	        text-align: left;
-	    }
-
-	    .sample {
-	        border: 1px solid #eeeeee;
-	        background: #ffffff;
-	        max-width: 30em;
-	        padding: 1em;
-	        margin-bottom: 1em;
-	    }
-
-	    .custom-select {
-	        position: relative;
-	    }
-
-	    .select-css {
-	        display: block;
-	        font-size: 1em;
-	        font-family: sans-serif;
-	        font-weight: 700;
-	        color: #444;
-	        line-height: 1.3;
-	        padding: .6em 1.4em .5em .8em;
-	        width: 100%;
-	        max-width: 100%;
-	        box-sizing: border-box;
-	        margin: 0;
-	        border: 1px solid #aaa;
-	        box-shadow: 0 1px 0 1px rgba(0, 0, 0, .04);
-	        border-radius: .25em;
-	        -moz-appearance: none;
-	        -webkit-appearance: none;
-	        appearance: none;
-	        background-color: #fff;
-	        position: relative;
-	        z-index: 10;
-	    }
-
-	    .select-css::-ms-expand {
-	        display: none;
-	    }
-
-	    .select-css:hover {
-	        border-color: #888;
-	    }
-
-	    .select-css:focus {
-	        //border: 2px dashed blue; 
-	        color: #222;
-	        outline: none;
-	    }
-
-	    .custom-select-icons {
-	        position: absolute;
-	        top: 0.5em;
-	        right: 0.5em;
-	        z-index: 20;
-	        border: 1px solid white;
-	        background: transparent;
-	    }
-
-	    .custom-select-options {
-	        border: 1px solid #0068a9;
-	        /* border-radius: 0 0 0.5em .5em!important; */
-	        /* line-height: 0.0; */
-	        margin: 0;
-	        /* margin-top: -0.5em; */
-	        padding: 0;
-	        list-style-type: none;
-	        font-weight: normal;
-	        cursor: pointer;
-	        z-index: 2;
-	        position: absolute;
-	        width: calc(100% - 1px);
-	        background-color: #ffffff;
-	    }
-
-	    .custom-select-options li {
-	        padding: 1px;
-	        font-size: 8px;
-	    }
-
-	    .custom-select-options li:hover {
-	        background: blue;
-	        color: #fff;
-	        border: 1px solid blue;
-	        border-width: 0 0 0 1px;
-	    }
-
-	    .custom-select-options li:focus {
-	        border: 2px blue;
-	    }
-
-	    .custom-select-options li.linck {
-	        padding: 1px;
-	        font-size: 8px;
-
-	        background: #eeeeee;
-	        color: #333333;
-	        border: 1px solid #eeeeee;
-	        border-width: 0 0 0 1px;
-	    }
-
-	    .custom-select-options li.linck:hover {
-	        background: blue;
-	        color: #fff;
-	        border: 1px solid blue;
-	        border-width: 0 0 0 1px;
-	    }
-
-	    .custom-select-options li.linck:focus {
-	        border: 2px blue;
-	    }
-
-	    .icon {
-	        fill: ButtonText;
-	        pointer-events: none;
-	    }
-
-	    @media screen and (-ms-high-contrast: active) {
-	        .icon {
-	            fill: ButtonText;
-	        }
-	    }
-
-	    .hidden-all {
-	        display: none;
-	    }
-
-	    .hidden-visually {
-	        position: absolute;
-	        width: 1px;
-	        height: 1px;
-	        padding: 0;
-	        overflow: hidden;
-	        clip: rect(0, 0, 0, 0);
-	        white-space: nowrap;
-	        -webkit-clip-path: inset(50%);
-	        clip-path: inset(50%);
-	        border: 0;
-	    }
-	</style>
 
 	<script>
 

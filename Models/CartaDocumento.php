@@ -10,14 +10,39 @@ class CartaDocumento {
 
     const ESTADO_CREADA = 1;
     const ESTADO_AUTORIZADA = 2;
+    const MODULO_CARTA_DOCUMENTO_SIMPLE = 'SIMPLE';
+    const MODULO_CARTA_DOCUMENTO_MASIVA = 'MASIVA';
 
     function __construct() {
     }
 
     public function crear($data){
         try {
-            // Debug: log the data
-            error_log("DEBUG - Data recibida: " . print_r($data, true));
+
+            if(!isset($data['destinatario_provincia_nombre']) || empty($data['destinatario_provincia_nombre'])){
+                $data['destinatario_provincia_nombre'] = null;
+            }
+
+            if(!isset($data['destinatario_localidad_nombre']) || empty($data['destinatario_localidad_nombre'])){
+                $data['destinatario_localidad_nombre'] = null;
+            }
+
+            if($data['destinatario_provincia_nombre'] == null && $data['destinatario_provincia'] == null){
+                throw new Exception("La provincia del destinatario es obligatoria.");
+            }
+
+            if($data['destinatario_localidad_nombre'] == null && $data['destinatario_localidad'] == null){
+                throw new Exception("La localidad del destinatario es obligatoria.");
+            }
+
+            if(!isset($data['origen_modulo']) || empty($data['origen_modulo'])){
+                $data['origen_modulo'] = self::MODULO_CARTA_DOCUMENTO_SIMPLE;
+            }
+            
+            $destinatario_provincia = $data['destinatario_provincia'] === null ? 'NULL' : "'{$data['destinatario_provincia']}'";
+            $destinatario_provincia_nombre = $data['destinatario_provincia_nombre'] === null ? 'NULL' : "'{$data['destinatario_provincia_nombre']}'";
+            $destinatario_localidad = $data['destinatario_localidad'] === null ? 'NULL' : "'{$data['destinatario_localidad']}'";
+            $destinatario_localidad_nombre = $data['destinatario_localidad_nombre'] === null ? 'NULL' : "'{$data['destinatario_localidad_nombre']}'";
             
             $con = new Conexion();
             $sql = "
@@ -28,7 +53,9 @@ class CartaDocumento {
                     destinatario_nombre,
                     destinatario_apellido,
                     destinatario_provincia,
+                    destinatario_provincia_nombre,
                     destinatario_localidad,
+                    destinatario_localidad_nombre,
                     destinatario_cp,
                     destinatario_calle,
                     destinatario_numero,
@@ -50,7 +77,8 @@ class CartaDocumento {
                     firmante_tipo_documento,
                     firmante_documento,
                     firma_cliente,
-                    contenido
+                    contenido,
+                    origen_modulo
                 )
                 VALUES (
                     '{$data['created_user_id']}',
@@ -58,8 +86,10 @@ class CartaDocumento {
                     '" . self::ESTADO_CREADA . "',
                     '{$data['destinatario_nombre']}',
                     '{$data['destinatario_apellido']}',
-                    '{$data['destinatario_provincia']}',
-                    '{$data['destinatario_localidad']}',
+                    {$destinatario_provincia},
+                    {$destinatario_provincia_nombre},
+                    {$destinatario_localidad},
+                    {$destinatario_localidad_nombre},
                     '{$data['destinatario_cp']}',
                     '{$data['destinatario_calle']}',
                     '{$data['destinatario_numero']}',
@@ -81,17 +111,12 @@ class CartaDocumento {
                     '{$data['firmante_tipo_documento']}',
                     '{$data['firmante_documento']}',
                     '{$data['firma_cliente']}',
-                    '{$data['contenido']}'
+                    '{$data['contenido']}',
+                    '{$data['origen_modulo']}'
                 );
             ";
             
-            // Debug: log the SQL
-            error_log("DEBUG - SQL generado: " . $sql);
-            
             $result = $con->insertar($sql);
-            
-            // Debug: log the result
-            error_log("DEBUG - Resultado del insert: " . ($result ? $result : 'false'));
             
             return $result;
 

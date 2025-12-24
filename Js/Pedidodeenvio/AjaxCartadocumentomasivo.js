@@ -1,5 +1,24 @@
     
     jQuery(document).ready(function() {
+		//Ajustar titulo de la página
+		document.title = "Carta Documento Masiva | Clientes";
+
+		//Ocultar contenedor de input file
+		document.getElementById("DivContenedorEcxelATabla").style.display = "none";
+
+		//Agregar evento a input file personalizado
+		document.getElementById("input-file-excel").addEventListener("click", function(){
+			document.getElementById("EcxelATabla").click();
+		});
+
+		//Cambiar texto al seleccionar archivo
+		document.getElementById("EcxelATabla").addEventListener("change", function(){
+			var nombreArchivo = this.value.split("\\").pop();
+			document.querySelector("#input-file-excel h4").innerText = "Archivo seleccionado:";
+			document.querySelector("#input-file-excel p").innerText = nombreArchivo;
+			document.querySelector("#input-file-excel svg").innerHTML = `<use xlink:href="/Styles/inicio/sprite.svg#check-circle"></use>`;
+		});
+
         const selectElement = document.querySelector('#custom-select-input');
         selectElement.addEventListener('change',function(){
             if(this.value == "Crea/Edita tus Plantillas"){
@@ -167,8 +186,8 @@
 			DivDeLinksEjemplos[i].style.display = "none" ;
 		}
 		DivDeLinksEjemplos[e.opcion].style.display = "block" ;
-		e.parentElement.parentElement.classList.remove("col-md-12");
-		e.parentElement.parentElement.classList.add("col-md-9");
+		// e.parentElement.parentElement.classList.remove("col-md-12");
+		// e.parentElement.parentElement.classList.add("col-md-12");
 		/*
 		switch(){
 			case :
@@ -283,8 +302,110 @@
 			$('#ModalDatos').modal('show');
 			//alert("Exec");
 		});
+
+		$("#EntrarAModalGuardarCD").on("click", function () {
+			const conf = confirm("Una vez confirmada las Cartas Documentos, los datos contenidos en la misma no podrán modificarse. Controle antes de confirmar su envío ya que luego no se podrán hacer reclamos al correo por datos incorrectos o inexistentes");
+		    if(conf){
+		        GuardarCartasDocumentos(this)
+		    }
+		    
+		});
 		
 	});
+
+	/**
+	 * 
+	 * PARA MAÑANA VER QUE CAMPOS SON LOS QUE SE TIENEN QUE VALIDAR Y ENVIAR PARA ALMACENAR LAS CARTAS DOCUMENTOS.
+	 * UNA VEZ QUE SE GUARDEN LAS CARTAS DOCUMENTOS ... PROBAR LA INSERCIÓN NORMAL
+	 * 
+	 */
+function GuardarCartasDocumentos(e){	
+	if(! Needed("RemitenteNombre","1")){return;}
+	if(! Needed("RemitenteCalle","1")){return;}
+	if(! Needed("RemitenteNumero","1")){return;}
+	
+	if(! Needed("RemitenteProvincia","1")){return;}
+	if(! Needed("RemitenteLocalidad","1")){return;}
+	if(! Needed("RemitenteCodigoPostal","4")){return;}
+	if(! Needed("RemitenteEmail","1")){return;}
+	if(! Needed("RemitenteCelular","14")){return;}
+	
+	if(! Needed("RemitenteNombreApoderado","1")){return;}
+	if(! Needed("RemitenteApellidoApoderado","1")){return;}
+	if(! Needed("RemitenteDNITipoApoderado","1")){return;}
+	if(! Needed("RemitenteDocumentoApoderado","1")){return;}
+
+	if(document.getElementById('EcxelATabla').value == "" || document.getElementById('EcxelATabla').value == null){
+		alert("Debe Seleccionar Un Archivo Excel Para Cargar Los Destinatarios");
+		return;
+	}
+	
+	var FirmaSeleccionada = document.getElementsByName("image0")[0];
+	if(FirmaSeleccionada == undefined){
+		var Firma = URLJS +"XMLHttpRequest/FirmasDeClientes/uploads/null.png";
+		filtro=["IdUsuario","User","time"];
+		filtroX=[UserId,"","0"];
+		var Parametros = ArraydsAJson(filtro,filtroX);
+		Parametros = JSON.stringify(Parametros);
+		var Config = JSON.parse(`
+		{
+			"DataAjax":` + Parametros + `,
+			"ValoresDirectos":null,
+			"MensajeEnFail":false,
+			"TextoEnFail":"",
+			"Ajax":"` + URLJS + `XMLHttpRequest/FirmasDeClientes/AjaxPonerFirmaDeUsuario.php"
+		}`);
+		//alert(URLJS);
+		SyncObtenerValorDeConsulta(Config);
+	}
+
+	const perfilId = $('#perfilId').val();
+	const sispoClienteId = $('#sispoClienteId').val();
+	
+	filtro=["IdUsuario","User","time","servicio_id","perfilId","sispoClienteId"];
+	filtroX=[UserId,"","0","33", perfilId, sispoClienteId];
+	var Parametros = ArraydsAJson(filtro,filtroX);
+	Parametros = JSON.stringify(Parametros);
+	var Indices=[
+		"textBox"
+	];
+	var Objetos=[
+		"textBox"
+	];
+	var ValoresDirectos = ArraydsAJson(Indices,Objetos);
+	
+	var ArraydJsonPostTitulo = "Piezas";
+	var Indices=[
+	,"RemitenteNombre","RemitenteNombreApoderado","RemitenteApellidoApoderado","RemitenteDNITipoApoderado","RemitenteDocumentoApoderado"
+	,"RemitenteCodigoPostal","RemitenteProvincia","RemitenteLocalidad","RemitenteCalle","RemitenteNumero","RemitentePiso","RemitenteDepartamento"
+	,"RemitenteEmail","RemitenteCelular","RemitenteObservaciones","TablaDestinatario"
+	];
+	var Objetos = [
+	,"RemitenteNombre","RemitenteNombreApoderado","RemitenteApellidoApoderado","RemitenteDNITipoApoderado","RemitenteDocumentoApoderado"
+	,"RemitenteCodigoPostal","RemitenteProvincia","RemitenteLocalidad","RemitenteCalle","RemitenteNumero","RemitentePiso","RemitenteDepartamento"
+	,"RemitenteEmail","RemitenteCelular","RemitenteObservaciones","TablaDestinatario"
+	];
+	var ArraydJsonPost = ArraydsAJson(Indices,Objetos);
+	
+	var Elementos=[""];
+	Elementos = JSON.stringify(Elementos);
+	
+	var Config = JSON.parse(`
+	{
+		"Elemento":"Estado",
+		"ArraydJsonPostTitulo":"` + ArraydJsonPostTitulo + `",
+		"ArraydJsonPost":` + ArraydJsonPost + `,
+		
+		"Elementos":` + Elementos + `,
+		"DataAjax":` + Parametros + `,
+		"ValoresDirectos":` + ValoresDirectos + `,
+		"MensajeEnFail":false,
+		"TextoEnFail":"No Se Encontraron Resultados",
+		"ValorDefault":"0",
+		"Ajax":"` + URLJS + `XMLHttpRequest/PedidoDeEnvio/AjaxGuardarCartaDocumentoMasiva.php"
+	}`);
+	ValoresAElementos(Config);
+}
 
 
 function formatDoc(sCmd, sValue){
