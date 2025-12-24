@@ -526,42 +526,40 @@
 	}else{
 		$EmailDeCliente = $EmailDeCliente. "correflash2017@gmail.com";//$_POST['us_mail'];
 	}
-	//$EmailDeCliente = "correflash2017@gmail.com";
+	
 	$EmailDeCliente = "correflash2017@gmail.com";
 	
     $mail = new PHPMailer(true);
 	try {
+		$body = '<p>Estimado cliente,</p>' .
+		'<p>Su Carta Documento esta siendo procesada.</p>' .
+		'<p>Recibirás en el transcurso del día un mail con el Codigo de Seguimiento donde podra conocer el estado de su Carta Documento en la pagina web del correo <a href="www.correoflash.com">www.correoflash.com</a></p>';
+
 		//Server settings
-		$mail->SMTPDebug = 0;                      //3 Enable verbose debug output
-		$mail->isSMTP();                                            // Send using SMTP
-		$mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
-		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		$mail->Username   = 'correo.flash.mail@gmail.com';
-		$mail->Password = 'qprdelceuvlxjazw'; // vriwdufntdddazxe
-		$mail->SMTPSecure = 'tls';         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-		$mail->Port       = 587;                                    // TCP port to connect to
-
+		$mail->SMTPDebug = 0;                      
+		$mail->isSMTP();                                            
+		$mail->SMTPAuth = true; 
+		$mail->SMTPSecure = getenv('MAIL_ENCRYPTION');
+		$mail->Host = getenv('MAIL_HOST');
+		$mail->Port = getenv('MAIL_PORT');
+		$mail->Username = getenv('MAIL_USERNAME');
+		$mail->Password = getenv('MAIL_PASSWORD'); 
+		$mail->SetFrom( getenv('MAIL_USERNAME'), getenv('MAIL_FROM'), 0);
         $mail->CharSet = 'UTF-8';
-
+		$mail->Timeout = 10;
+		$mail->IsHTML(true);
 		//Recipients
-		$mail->setFrom('correo.flash.mail@gmail.com', 'CorreoFlash');
-		
 		$Emails = explode( ',', $EmailDeCliente);
 		for($i=0;$i<count($Emails);$i++){
 			$mail->addAddress($Emails[$i]);     // Add a recipient
 		}
 
 		// Content
-		$mail->isHTML(true);                                  // Set email format to HTML
-		$mail->Subject = 'Su Envio De Carta Documento';
-		$mail->Body = '<p>Estimado cliente,</p>' .
-		'<p>Su Carta Documento esta siendo procesada.</p>' .
-		'<p>Recibirás en el transcurso del día un mail con el Codigo de Seguimiento donde podra conocer el estado de su Carta Documento en la pagina web del correo <a href="www.correoflash.com">www.correoflash.com</a></p>' .
-		'';
-
+		$mail->isHTML(true);                                 
+		$mail->Subject = html_entity_decode('Su Envio De Carta Documento');
+		$mail->Body = html_entity_decode($body);
 		
 		$mail->send();
-		//echo 'Message has been sent';
 	} catch (Exception $e) {
 		$logger->exception('Error al enviar mail con el estado del pedido', $e, [
 			'usuario_id' => $GPIdUsuario,
