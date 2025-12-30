@@ -1,5 +1,7 @@
 <?php namespace Views;
 	use Config\Elementos as Elementos;
+    use Models\PerfilCliente;
+
 	$template = new Template();
 	if (file_exists('Config/Elementos.php')){
 		require_once('Config/Elementos.php');
@@ -67,6 +69,10 @@
         }
         return false;
     }
+
+    $userId = $_SESSION['idusuario'] ?? null;
+    $perfilUsuario = $_SESSION['idperfil'] ?? null;		
+    $clienteId = $_SESSION['cliente_id'] ?? null;
 ?>
 <script>
 	var UserId = <?= (json_encode($UserId));?>;
@@ -199,22 +205,40 @@
                                     </svg>
                                 </a>
                                 <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumento" class="nav-link">
-                                            <svg width="24" height="24">
-                                                <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
-                                            </svg>
-                                            <p>Carta documento</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumentomasivo" class="nav-link">
-                                            <svg width="24" height="24">
-                                                <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
-                                            </svg>
-                                            <p>Carta documento masiva</p>
-                                        </a>
-                                    </li>
+                                    <?php if(in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREADOR])){  ?>
+
+                                        <li class="nav-item">
+                                            <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumento" class="nav-link">
+                                                <svg width="24" height="24">
+                                                    <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
+                                                </svg>
+                                                <p>Carta documento</p>
+                                            </a>
+                                        </li>
+                                        
+                                        <li class="nav-item">
+                                            <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumentomasivo" class="nav-link">
+                                                <svg width="24" height="24">
+                                                    <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
+                                                </svg>
+                                                <p>Carta documento masiva</p>
+                                            </a>
+                                        </li>
+
+                                    <?php } ?>
+
+                                    <?php if(in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::AUTORIZADOR, PerfilCliente::IMPRIMIDOR])){  ?>
+
+                                        <li class="nav-item">
+                                            <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/autorizar" class="nav-link">
+                                                <svg width="24" height="24">
+                                                    <use xlink:href="/Styles/inicio/sprite.svg#note"></use>
+                                                </svg>
+                                                <p>Gestionar</p>
+                                            </a>
+                                        </li>
+
+                                    <?php } ?>
                                 </ul>
                             </li>
 
