@@ -9,7 +9,8 @@
       "Models\\": "Models/",
       "Controllers\\": "Controllers/",
       "Config\\": "Config/",
-      "Helpers\\": "Helpers/"
+      "Helpers\\": "Helpers/",
+      "Service\\": "Service/"
     }
   }
 }
