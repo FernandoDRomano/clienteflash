@@ -1,18 +1,25 @@
 <?php
-		$Objeto = json_encode($_REQUEST);
-		$Post = json_decode($Objeto, false);
-		$InicioDeAnio = "InicioDeAnio";
-		$Fecha = "Fecha";
-		if(isset($_SESSION['idusuario'])){
-			$UserId = $_SESSION['idusuario'];
-			//$IdUsuarioSpp = $_SESSION['idusuario'];
-		}
-		use Config\Elementos as Elementos;
-        use Models\PerfilCliente;
+    use Models\PerfilCliente;
+    use Config\Elementos as Elementos;
 
-        $perfilUsuario = $_SESSION['idperfil'] ?? null;		
-        $clienteId = $_SESSION['cliente_id'] ?? null;
-	?>
+    $Objeto = json_encode($_REQUEST);
+    $Post = json_decode($Objeto, false);
+    $InicioDeAnio = "InicioDeAnio";
+    $Fecha = "Fecha";
+    if(isset($_SESSION['idusuario'])){
+        $UserId = $_SESSION['idusuario'];
+        //$IdUsuarioSpp = $_SESSION['idusuario'];
+    }
+
+    $perfilUsuario = $_SESSION['idperfil'] ?? null;		
+    $clienteId = $_SESSION['cliente_id'] ?? null;
+
+    //Redirigir si el usuario no tiene permisos para acceder a esta página
+    if (!in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREADOR])) {
+        echo "<script>window.location.href = '/principal/inicio';</script>";
+        exit();
+    }
+?>
 	<style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
