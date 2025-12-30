@@ -235,6 +235,7 @@ async function buscarCartasDocumentos(event) {
 
         } else {
             console.error("Error al buscar cartas de documento:", result.message);
+            mostrarMensaje(result.message || "Error al buscar cartas de documento.", 'danger');
         }
     } catch (error) {
         console.error("Error al buscar cartas de documento:", error);
@@ -250,12 +251,12 @@ function validarFiltros() {
     const estadoCD = document.getElementById("EstadoCartaDocumento").value;
 
     if (new Date(fechaDesde) > new Date(fechaHasta)) {
-        alert("La fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.");
+        mostrarMensaje("La fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.", 'danger');
         return false;
     }
 
     if(!usuarioCD && !estadoCD && !fechaDesde && !fechaHasta) {
-        alert("Por favor, seleccione al menos un filtro para la búsqueda.");
+        mostrarMensaje("Por favor, seleccione al menos un filtro para la búsqueda.", 'danger');
         return false;
     }
     
@@ -300,15 +301,15 @@ async function autorizarCartaDocumento(cartaDocumentoId) {
         const result = await response.json();
 
         if (result.status === "success") {
-            alert("Carta documento autorizada correctamente.");
+            mostrarMensaje("Carta documento autorizada correctamente.", 'success');
             buscarCartasDocumentos(new Event('submit'));
         } else {
             console.error("Error al autorizar la carta documento:", result.message);
-            alert(result.message || "Error al autorizar la carta documento.");
+            mostrarMensaje(result.message || "Error al autorizar la carta documento.", 'danger');
         }
     } catch (error) {
         console.error("Error al autorizar la carta documento:", error);
-        alert("Error al autorizar la carta documento.");
+        mostrarMensaje("Error al autorizar la carta documento.", 'danger');
     } finally {
         EndLoading();
     }
@@ -339,15 +340,15 @@ async function rechazarCartaDocumento(cartaDocumentoId) {
         const result = await response.json();
 
         if (result.status === "success") {
-            alert("Carta documento rechazada correctamente.");
+            mostrarMensaje("Carta documento rechazada correctamente.", 'success');
             buscarCartasDocumentos(new Event('submit'));
         } else {
             console.error("Error al rechazar la carta documento:", result.message);
-            alert(result.message || "Error al rechazar la carta documento.");
+            mostrarMensaje(result.message || "Error al rechazar la carta documento.", 'danger');
         }
     } catch (error) {
         console.error("Error al rechazar la carta documento:", error);
-        alert("Error al rechazar la carta documento.");
+        mostrarMensaje("Error al rechazar la carta documento.", 'danger');
     } finally {
         EndLoading();
     }
@@ -359,7 +360,7 @@ async function verDetalle(cartaDocumentoId) {
         const cartaData = CARTAS_DOCUMENTOS.find(cd => cd.id == cartaDocumentoId);
 
         if (!cartaData) {
-            alert("No se encontró la carta documento.");
+            mostrarMensaje("No se encontró la carta documento.", 'danger');
             EndLoading();
             return;
         }
@@ -369,7 +370,7 @@ async function verDetalle(cartaDocumentoId) {
 
     } catch (error) {
         console.error("Error al obtener carta documento:", error);
-        alert("Error al cargar los datos de la carta documento");
+        mostrarMensaje("Error al cargar los datos de la carta documento", 'danger');
         EndLoading();
     }
 }
@@ -380,7 +381,7 @@ async function descargarPDF(cartaDocumentoId){
         const cartaData = CARTAS_DOCUMENTOS.find(cd => cd.id == cartaDocumentoId);
 
         if (!cartaData) {
-            alert("No se encontró la carta documento.");
+            mostrarMensaje("No se encontró la carta documento.", 'danger');
             EndLoading();
             return;
         }
@@ -388,7 +389,7 @@ async function descargarPDF(cartaDocumentoId){
         await descargarPDFCartaDocumento(cartaData);
     } catch (error) {
         console.error("Error al descargar el PDF de la carta documento:", error);
-        alert("Error al descargar la carta documento");
+        mostrarMensaje("Error al descargar la carta documento", 'danger');
     } finally {
         EndLoading();
     }
@@ -405,7 +406,7 @@ async function descargarPDFCartaDocumento(cartaData) {
         document.body.removeChild(link);
     } catch (error) {
         console.error("Error al descargar el PDF de la carta documento:", error);
-        alert("Error al descargar la carta documento");
+        mostrarMensaje("Error al descargar la carta documento", 'danger');
     }
 }
 
@@ -484,7 +485,7 @@ async function generarPDFCartaDocumento(cartaData) {
         return pdfDataUri;
     } catch (error) {
         console.error("Error al generar el PDF:", error);
-        alert("Error al generar la vista previa de la carta documento");
+        mostrarMensaje("Error al generar la vista previa de la carta documento.", 'danger');
         throw error;
     }
 }
@@ -614,7 +615,7 @@ async function generarImagenCartaDocumento(cartaData) {
         return imagenPNG;
     } catch (error) {
         console.error("generarImagenCartaDocumento", error);
-        alert("Error al generar la vista previa de la carta documento");
+        mostrarMensaje("Error al generar la vista previa de la carta documento.", 'danger');
         throw error;
     }
 }
@@ -736,4 +737,14 @@ function descargarImagen() {
     link.download = `carta-documento-${Date.now()}.png`;
     link.href = imgElement.src;
     link.click();
+}
+
+function mostrarMensaje(mensaje, tipo = 'info') {
+    $.bootstrapGrowl(mensaje, {
+        type: tipo,
+        delay: 3000,
+        align: 'center',
+        width: 'auto',
+        allow_dismiss: true,
+    });
 }
