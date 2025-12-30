@@ -3,17 +3,18 @@
 namespace Models;
 
 use Exception;
-
-include 'Conexion.php';
+use Models\Conexion;
+use Models\CartaDocumentoEstado;
+use Helpers\LogManager;
 
 class CartaDocumento {
 
-    const ESTADO_CREADA = 1;
-    const ESTADO_AUTORIZADA = 2;
     const MODULO_CARTA_DOCUMENTO_SIMPLE = 'SIMPLE';
     const MODULO_CARTA_DOCUMENTO_MASIVA = 'MASIVA';
+    private $log;
 
     function __construct() {
+        $this->log = new LogManager();
     }
 
     public function crear($data){
@@ -83,7 +84,7 @@ class CartaDocumento {
                 VALUES (
                     '{$data['created_user_id']}',
                     '{$data['cliente_id']}',
-                    '" . self::ESTADO_CREADA . "',
+                    '" . CartaDocumentoEstado::PENDIENTE . "',
                     '{$data['destinatario_nombre']}',
                     '{$data['destinatario_apellido']}',
                     {$destinatario_provincia},
@@ -121,9 +122,8 @@ class CartaDocumento {
             return $result;
 
         } catch (Exception $e) {
-            //registrar en el log de php
-            error_log("Error al crear carta documento: " . $e->getMessage());
-            echo "Error al crear carta documento."; die();
+            $this->log->exception("Error al crear carta documento: ", $e->getMessage());
+            throw $e;
         }
     }
 
@@ -134,8 +134,8 @@ class CartaDocumento {
             $resultado = $con->consultaRetorno($sql);
             return mysqli_fetch_assoc($resultado);
         } catch (Exception $e) {
-            error_log("Error al obtener carta documento por ID: " . $e->getMessage());
-            echo "Error al obtener carta documento."; die();
+            $this->log->exception("Error al obtener carta documento por ID: ", $e->getMessage());
+            throw $e;
         }
     }
 
@@ -145,23 +145,23 @@ class CartaDocumento {
             $wheres = [];
             
             if(isset($filtro['user_id']) && !empty($filtro['user_id'])){
-                $wheres[] = " created_user_id = '{$filtro['user_id']}' ";
+                $wheres[] = " cd.created_user_id = '{$filtro['user_id']}' ";
             }
 
             if(isset($filtro['cliente_id']) && !empty($filtro['cliente_id'])){
-                $wheres[] = " cliente_id = '{$filtro['cliente_id']}' ";
+                $wheres[] = " cd.cliente_id = '{$filtro['cliente_id']}' ";
             }
 
             if(isset($filtro['estado']) && !empty($filtro['estado'])){
-                $wheres[] = " estado = '{$filtro['estado']}' ";
+                $wheres[] = " cd.estado = '{$filtro['estado']}' ";
             }
 
             if(isset($filtro['fecha_desde']) && !empty($filtro['fecha_desde'])){
-                $wheres[] = " created_at >= '{$filtro['fecha_desde']}' ";
+                $wheres[] = " cd.created_at >= '{$filtro['fecha_desde']} 00:00:00' ";
             }
 
             if(isset($filtro['fecha_hasta']) && !empty($filtro['fecha_hasta'])){
-                $wheres[] = " created_at <= '{$filtro['fecha_hasta']}' ";
+                $wheres[] = " cd.created_at <= '{$filtro['fecha_hasta']} 23:59:59' ";
             }
 
             $whereSql = "";
@@ -169,13 +169,42 @@ class CartaDocumento {
                 $whereSql = " WHERE " . implode(" AND ", $wheres);
             }
 
-            $sql = "SELECT * FROM cartas_documentos " . $whereSql . " ORDER BY created_at DESC;";
-            $resultado = $con->consultaRetorno($sql);
-            return mysqli_fetch_assoc($resultado);
+            $sql = "
+                SELECT 
+                    cd.*,
+                    cl_creo.Id AS usuario_creo_id,
+                    cl_creo.Alias AS usuario_creo_username,
+                    cl_creo.Nombre AS usuario_creo_nombre,
+                    cl_creo.Apellido AS usuario_creo_apellido,
+                    cl_autorizo.Id AS usuario_autorizo_id,
+                    cl_autorizo.Alias AS usuario_autorizo_username,
+                    cl_autorizo.Nombre AS usuario_autorizo_nombre,
+                    cl_autorizo.Apellido AS usuario_autorizo_apellido,
+                    cl_rechazo.Id AS usuario_rechazo_id,
+                    cl_rechazo.Alias AS usuario_rechazo_username,
+                    cl_rechazo.Nombre AS usuario_rechazo_nombre,
+                    cl_rechazo.Apellido AS usuario_rechazo_apellido,
+                    p.Nombre AS provincia_nombre,
+                    l.nombre AS localidad_nombre
+                FROM cartas_documentos cd 
+                LEFT JOIN cliente cl_creo ON cd.created_user_id = cl_creo.Id
+                LEFT JOIN cliente cl_autorizo ON cd.authorized_user_id = cl_autorizo.Id
+                LEFT JOIN cliente cl_rechazo ON cd.refused_user_id = cl_rechazo.Id
+                LEFT JOIN provincias p on p.id = cd.destinatario_provincia
+                LEFT JOIN localidades l on l.id = cd.destinatario_localidad
+                " . $whereSql . " ORDER BY created_at DESC;";
+            $datos = $con->consultaRetorno($sql);
+
+            $cartasDocumentos = [];
+            while ($row = mysqli_fetch_assoc($datos)) {
+                $cartasDocumentos[] = $row;
+            }
+
+            return $cartasDocumentos;
 
         } catch (Exception $e) {
-            error_log("Error al filtrar cartas documento por usuario: " . $e->getMessage());
-            echo "Error al filtrar cartas documento."; die();
+            $this->log->exception("Error al filtrar cartas documentos: ", $e->getMessage());
+            throw $e;
         }
     }
 
@@ -184,15 +213,32 @@ class CartaDocumento {
             $con = new Conexion();
             $sql = "
                 UPDATE cartas_documentos 
-                SET estado = '" . self::ESTADO_AUTORIZADA . "', 
+                SET estado = '" . CartaDocumentoEstado::AUTORIZADO . "', 
                     authorized_user_id = '{$usuario_id}', 
                     authorized_at = CURRENT_TIMESTAMP 
                 WHERE id = '{$id}';
             ";
             $con->consultaSimple($sql);
         } catch (Exception $e) {
-            error_log("Error al autorizar carta documento: " . $e->getMessage());
-            echo "Error al autorizar carta documento."; die();
+            $this->log->exception("Error al autorizar carta documento: ", $e->getMessage());
+            throw new Exception("Error al autorizar carta documento.");
+        }
+    }
+
+    public function rechazar($id, $usuario_id){
+        try {
+            $con = new Conexion();
+            $sql = "
+                UPDATE cartas_documentos 
+                SET estado = '" . CartaDocumentoEstado::RECHAZADO . "', 
+                    refused_user_id = '{$usuario_id}', 
+                    refused_at = CURRENT_TIMESTAMP 
+                WHERE id = '{$id}';
+            ";
+            $con->consultaSimple($sql);
+        } catch (Exception $e) {
+            $this->log->exception("Error al rechazar carta documento: ", $e->getMessage());
+            throw new Exception("Error al rechazar carta documento.");
         }
     }
 }
