@@ -61,5 +61,21 @@ class ConexionSispo{
 		}
 		return mysqli_insert_id($this->con);
 	}
+
+	public function beginTransaction(){
+		mysqli_begin_transaction($this->con);
+	}
+
+	public function commit(){
+		mysqli_commit($this->con);
+	}
+
+	public function rollback(){
+		mysqli_rollback($this->con);
+	}
+
+	public function getConnection(){
+		return $this->con;
+	}
 }
 ?>
