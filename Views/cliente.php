@@ -265,7 +265,7 @@
                                 </ul>
                             </li>
                             
-                            <li class="nav-item <?= estaElMenuActivo('clienteruteoservicios') ? 'menu-activo' : '' ?>">
+                            <li class="nav-item <?= estaElMenuActivo('clienteruteoservicios') ? 'menu-activo' : '' ?>" style="display: none;">
                                 <a href="#" class="nav-link">
                                     <svg width="24" height="24">
                                         <use xlink:href="/Styles/inicio/sprite.svg#location"></use>
