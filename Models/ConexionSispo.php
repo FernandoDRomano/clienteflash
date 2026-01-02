@@ -77,5 +77,9 @@ class ConexionSispo{
 	public function getConnection(){
 		return $this->con;
 	}
+
+	public function escapeString($string){
+		return mysqli_real_escape_string($this->con, $string);
+	}
 }
 ?>
