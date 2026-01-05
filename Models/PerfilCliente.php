@@ -7,4 +7,5 @@ class PerfilCliente {
     const AUTORIZADOR = 2;
     CONST CREADOR = 3;
     const IMPRIMIDOR = 4;
+    const DEFAULT = 5;
 }
