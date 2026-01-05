@@ -1,5 +1,5 @@
 //Establecer titulo de la página
-document.title = "Autorizar Cartas de Documento - Clientes";
+document.title = "Autorizar Cartas de Documento | Clientes";
 
 //Deshabilitar click derecho
 document.addEventListener('contextmenu', event => event.preventDefault());
@@ -201,14 +201,13 @@ async function buscarCartasDocumentos(event) {
 
                 const botonAutorizar = `<button onclick="autorizarCartaDocumento(${cd.id})" data-toggle="tooltip" data-placement="top" title="Autorizar Carta Documento" class="btn btn-sm btn-primary d-flex justify-content-center align-items-center ${!esPendiente ? 'disabled' : ''}" ${!esPendiente ? 'disabled' : ''} style="gap: 5px;"><i class="fas fa-check-circle"></i> Autorizar</button>`;
                 const botonRechazar = `<button onclick="rechazarCartaDocumento(${cd.id})" data-toggle="tooltip" data-placement="top" title="Rechazar Carta Documento" class="btn btn-sm btn-danger d-flex justify-content-center align-items-center ${!esPendiente ? 'disabled' : ''}" ${!esPendiente ? 'disabled' : ''} style="gap: 5px;"> <i class="fas fa-times-circle"></i>Rechazar</button>`;
-                const botonVer = `<button onclick="verDetalle(${cd.id})" data-toggle="tooltip" data-placement="top" title="Ver detalles de Carta Documento" class="btn btn-sm btn-warning text-white d-flex justify-content-center align-items-center" style="gap: 5px;"><i class="fas fa-eye"></i> Ver</button>`;
+                // const botonVer = `<button onclick="verDetalle(${cd.id})" data-toggle="tooltip" data-placement="top" title="Ver detalles de Carta Documento" class="btn btn-sm btn-warning text-white d-flex justify-content-center align-items-center" style="gap: 5px;"><i class="fas fa-eye"></i> Ver</button>`;
                 const botonDescargar = `<button onclick="descargarPDF(${cd.id})" data-toggle="tooltip" data-placement="top" title="Descargar PDF de Carta Documento" class="btn btn-sm btn-info btn-descargar-cd d-flex justify-content-center align-items-center ${!esAutorizado ? 'disabled' : ''}"  ${!esAutorizado ? 'disabled' : ''} style="gap: 5px;"><i class="fas fa-download"></i> Descargar</button>`;
 
                 const botones = `
                     <div class="btn-group" style="gap: 10px;" role="group" aria-label="Acciones Carta Documento">
                         ${ [PERFILES_USUARIOS.ADMINISTRADOR, PERFILES_USUARIOS.AUTORIZADOR].includes(PERFIL_USUARIO) ? botonAutorizar : '' }
                         ${ [PERFILES_USUARIOS.ADMINISTRADOR, PERFILES_USUARIOS.AUTORIZADOR].includes(PERFIL_USUARIO) ? botonRechazar : '' }
-                        ${ botonVer }
                         ${ [PERFILES_USUARIOS.ADMINISTRADOR, PERFILES_USUARIOS.IMPRIMIDOR].includes(PERFIL_USUARIO) ? botonDescargar : '' }
                     </div>
                 `
@@ -354,26 +353,26 @@ async function rechazarCartaDocumento(cartaDocumentoId) {
     }
 }
 
-async function verDetalle(cartaDocumentoId) {
-    Loading();
-    try {
-        const cartaData = CARTAS_DOCUMENTOS.find(cd => cd.id == cartaDocumentoId);
+// async function verDetalle(cartaDocumentoId) {
+//     Loading();
+//     try {
+//         const cartaData = CARTAS_DOCUMENTOS.find(cd => cd.id == cartaDocumentoId);
 
-        if (!cartaData) {
-            mostrarMensaje("No se encontró la carta documento.", 'danger');
-            EndLoading();
-            return;
-        }
+//         if (!cartaData) {
+//             mostrarMensaje("No se encontró la carta documento.", 'danger');
+//             EndLoading();
+//             return;
+//         }
 
-        const imagenPNG = await generarImagenCartaDocumento(cartaData);
-        mostrarModalImagen(imagenPNG);
+//         const imagenPNG = await generarImagenCartaDocumento(cartaData);
+//         mostrarModalImagen(imagenPNG);
 
-    } catch (error) {
-        console.error("Error al obtener carta documento:", error);
-        mostrarMensaje("Error al cargar los datos de la carta documento", 'danger');
-        EndLoading();
-    }
-}
+//     } catch (error) {
+//         console.error("Error al obtener carta documento:", error);
+//         mostrarMensaje("Error al cargar los datos de la carta documento", 'danger');
+//         EndLoading();
+//     }
+// }
 
 async function descargarPDF(cartaDocumentoId){
     Loading();
