@@ -1,6 +1,109 @@
 <?php
 	//echo("Suses");
 	//exit;
+
+	//Iniciar sessiones si no están iniciadas
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    header("Access-Control-Allow-Origin: *");
+        
+    // Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
+    require_once __DIR__ . '/../../Config/bootstrap.php';
+
+    use Throwable;
+    use Models\Pieza;
+    use Helpers\LogManager;
+
+    //Obtener datos de la request
+    $request = file_get_contents("php://input");
+    $request = json_decode($request, true);
+
+    $log = new LogManager();
+
+    $log->info("BuscarEstadosDePiezaSispo", "Request recibida", $request);
+
+	$piezaId = $request['PiezaId'] ?? null;
+	$clienteId = $request['ClienteId'] ?? null;
+	$userId = $request['UserId'] ?? null;
+
+	try {
+		$piezaModel = new Pieza();
+		$data = $piezaModel->filtrar([
+            'clienteId' => $clienteId,
+            'piezaId' => $piezaId
+        ]);
+
+        if (!$data || count($data) === 0) {
+            $log->info("BuscarEstadosDePiezaSispo", "No se encontraron piezas estados con los filtros proporcionados.", [
+                'filtros' => $request
+            ]);
+
+            http_response_code(404);
+            echo json_encode([
+                'data' => [],
+                'message' => 'No se encontraron piezas estados con los filtros proporcionados.',
+                'status' => 'success'
+            ]); die;
+        }
+
+		$data = formatearRespuesta($data);
+
+		http_response_code(200);
+		echo json_encode([
+			"status" => "success",
+			"message" => "Piezas estados encontrados correctamente.",
+			"data" => $data
+		]);
+	} catch (Throwable $e) {
+		$log->exception("Error al buscar estados de pieza Sispo: ", $e->getMessage());
+
+		http_response_code(500);
+		echo json_encode([
+			"status" => "error",
+			"message" => "Ocurrió un error al buscar los estados de la pieza."
+		]);
+	}
+
+	die;
+
+	function formatearRespuesta($dataEstado){
+		$pieza = $dataEstado[0];
+
+		$data = [
+			"barcode_externo" => $pieza[0],
+			"pieza_id" => $pieza[3],
+			"ultimo_estado" => $pieza[8],
+			"fecha_ultimo_estado" => $pieza[7],
+			"destinatario" => $pieza[10],
+			"documento" => $pieza[14],
+			"direccion" => $pieza[11],
+			"recibio" => $pieza[15],
+			"vinculo" => $pieza[16],
+			"foto_acuse" => null,
+		];
+
+		$estados = [];
+		foreach($dataEstado as $estado){
+			//Agregar todos los estados
+			$estados[] = [
+				"estado_id" => $estado[2],
+				"estado" => $estado[5],
+				"fecha" => $estado[1]
+			];
+
+			//Agregar foto
+			if(!empty($estado[17] && !is_null($estado[17]))){
+				$data["foto_acuse"] = $estado[17];
+			}
+		}
+
+		$data["estados"] = $estados;
+
+		return $data;
+	}
+
 	function ToASCIITilde($str) { 
 		$a = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ'); 
 		//$b = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o'); 

@@ -571,6 +571,44 @@ select.select-2 + .select2-container .select2-selection__arrow {
 }
 
 /*
+  BUSQUEDA DE PIEZAS
+*/
+
+.btn-buscar-piezas{
+  background-color: var(--color-principal) !important;
+  color: white !important;
+  border: none !important;
+  font-weight: bold !important;
+  width: 150px;
+  font-size: 1rem !important;
+}
+
+.btn-buscar-piezas:hover{
+  background-color: var(--color-principal) !important;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.btn-exportar-piezas{
+  background-color: black !important;
+  color: white !important;
+  border: none !important;
+  font-weight: bold !important;
+  width: 150px;
+  font-size: 1rem !important;
+}
+
+.btn-exportar-piezas:hover{
+  background-color: #333333 !important;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.form-group label{
+  font-weight: 600 !important;
+}
+
+/*
  * MEDIA QUERYS
  */
 
