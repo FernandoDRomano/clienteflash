@@ -10,12 +10,63 @@ header("Access-Control-Allow-Origin: *");
 // Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
 require_once __DIR__ . '/../../Config/bootstrap.php';
 use Exception;
-use Models\PerfilCliente;
-use Models\CartaDocumento;
 use Helpers\LogManager;
+use Models\PerfilCliente;
+use Service\EmailService;
+use Models\CartaDocumento;
 use Service\InsertarPiezaGestionPostal;
 
 $log = new LogManager();
+
+/**
+ * Enviar email de notificación de carta documento autorizada
+ * No crítico - los errores se loggean pero no interrumpen el proceso
+ * 
+ * @param array $data Datos del destinatario
+ * @param int $cartaDocumentoId ID de la carta documento
+ * @param LogManager $log Instancia del logger
+ * @return void
+ */
+function enviarEmailNotificacion($data, $cartaDocumentoId, $log) {
+    try {
+        $destinatarioEmail = 'fernando.daniel.romano.2020@gmail.com'; //$data['destinatarioEmail'] ?? '';
+        
+        if (empty($destinatarioEmail)) {
+            $log->warning("AjaxAutorizarCartaDocumento", "No se pudo enviar email: destinatario sin email", [
+                'cartaDocumentoId' => $cartaDocumentoId
+            ]);
+            return;
+        }
+
+        $subject = "Carta Documento Autorizada - Correo Flash";
+        
+        $body = '<p>Estimado/a ' . htmlspecialchars($data['destinatarioNombre'] . ' ' . $data['destinatarioApellido']) . ',</p>';
+        $body .= '<p>Su carta documento ha sido autorizada y procesada correctamente.</p>';
+        $body .= '<p>Pronto recibirá más información sobre el envío.</p>';
+        $body .= '<br><p>Saludos cordiales,<br>Correo Flash</p>';
+
+        $emailService = new EmailService();
+        $emailService->send($destinatarioEmail, $subject, $body, [
+            'isHtml' => true
+        ]);
+
+        $log->info("AjaxAutorizarCartaDocumento", "Email de notificación enviado", [
+            'cartaDocumentoId' => $cartaDocumentoId,
+            'destinatario' => $destinatarioEmail
+        ]);
+
+    } catch (Exception $e) {
+        $log->exception("Error al enviar email de notificación (carta documento ya autorizada)", $e, [
+            'cartaDocumentoId' => $cartaDocumentoId,
+            'destinatario' => $destinatarioEmail ?? 'N/A'
+        ]);
+    } catch (Throwable $t) {
+        $log->exception("Error al enviar email de notificación (carta documento ya autorizada)", $t, [
+            'cartaDocumentoId' => $cartaDocumentoId,
+            'destinatario' => $destinatarioEmail ?? 'N/A'
+        ]);
+    }
+}
 
 //Obtener datos de la request
 $request = file_get_contents("php://input");
@@ -118,6 +169,9 @@ try {
         'cartaDocumentoId' => $cartaDocumentoId,
         'userId' => $userId
     ]);
+
+    // Enviar email de notificación (no crítico)
+    enviarEmailNotificacion($data, $cartaDocumentoId, $log);
 
     echo json_encode([
         "status" => "success",
