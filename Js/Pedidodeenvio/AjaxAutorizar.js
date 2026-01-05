@@ -377,6 +377,29 @@ async function rechazarCartaDocumento(cartaDocumentoId) {
 async function descargarPDF(cartaDocumentoId){
     Loading();
     try {
+        const request = await fetch('/XMLHttpRequest/PedidoDeEnvio/AjaxDescargarCartaDocumento.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: USER_ID,
+                clientId: CLIENTE_ID,
+                perfilId: PERFIL_USUARIO,
+                cartaDocumentoId: cartaDocumentoId,
+            })
+        });
+
+        const response = await request.json();
+
+        console.log("Response descargarPDF:", response);
+
+        if (response.status !== "success") {
+            mostrarMensaje(response.message || "Error al descargar la carta documento", 'danger');
+            EndLoading();
+            return;
+        }
+
         const cartaData = CARTAS_DOCUMENTOS.find(cd => cd.id == cartaDocumentoId);
 
         if (!cartaData) {
