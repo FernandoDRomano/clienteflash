@@ -5,6 +5,8 @@
 	require_once __DIR__ . '/../../Config/bootstrap.php';
 
 	use Helpers\LogManager;
+	use Models\PiezaNovedad;
+	use Models\PiezaTracking;
 
 	$RespuestaJsonAjax = array('');
 	$_REQUEST = json_decode($_REQUEST["js"],true);
@@ -682,6 +684,52 @@
 
 			$RespuestaJsonAjax = array('');
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto La Pieza CD",$RespuestaJsonAjax);
+			if($RespuestaJsonAjax[0] == ""){
+				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+			}
+			functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
+		}
+
+		//Insertar tracking
+		$trackingModel = new PiezaTracking();
+		$trackingId = $trackingModel->crear([
+			'piezaId' => $PiezaIngrezada,
+		]);
+
+		if($trackingId){
+			$_REQUEST["PiezaTrackingId"][$i]= $trackingId;
+		}else{
+			$logger->error('Error al insertar tracking de la pieza', [
+				'pieza_id' => $PiezaIngrezada,
+				'usuario_id' => $GPIdUsuario,
+				'data' => $_REQUEST
+			]);
+
+			$RespuestaJsonAjax = array('');
+			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto El Tracking De La Pieza",$RespuestaJsonAjax);
+			if($RespuestaJsonAjax[0] == ""){
+				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+			}
+			functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
+		}
+
+		//Insertar Pieza Novedad
+		$piezaNovedadModel = new PiezaNovedad();
+		$novedadId = $piezaNovedadModel->crear([
+			'piezaId' => $PiezaIngrezada
+		]);
+
+		if($novedadId){
+			$_REQUEST["PiezaNovedadId"][$i]= $novedadId;
+		}else{
+			$logger->error('Error al insertar novedad de la pieza', [
+				'pieza_id' => $PiezaIngrezada,
+				'usuario_id' => $GPIdUsuario,
+				'data' => $_REQUEST
+			]);
+
+			$RespuestaJsonAjax = array('');
+			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Inserto La Novedad De La Pieza",$RespuestaJsonAjax);
 			if($RespuestaJsonAjax[0] == ""){
 				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 			}
