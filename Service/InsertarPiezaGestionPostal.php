@@ -9,6 +9,8 @@ use Models\ComprobanteIngresoServicio;
 use Models\Pieza;
 use Models\PiezaCD;
 use Models\Cliente;
+use Models\PiezaNovedad;
+use Models\PiezaTracking;
 use Models\ConexionSispo;
 use Helpers\LogManager;
 
@@ -97,13 +99,27 @@ class InsertarPiezaGestionPostal {
                 'formulario' => $data['formulario']
             ], $con);
 
+            // Crear Pieza Tracking
+            $piezaTrackingModel = new  PiezaTracking();
+            $piezaTrackingId = $piezaTrackingModel->crear([
+                'piezaId' => $piezaId
+            ], $con);
+
+            // Crear Pieza Novedad
+            $piezaNovedadModel = new PiezaNovedad();
+            $piezaNovedadId = $piezaNovedadModel->crear([
+                'piezaId' => $piezaId
+            ], $con);   
+
             $resultado = [
                 'comprobanteIngresoGeneradoId' => $comprobanteIngresoGenerado['id'],
                 'numero' => $comprobanteIngresoGenerado['numero'],
                 'comprobanteIngresoId' => $comprobanteIngresoId,
                 'comprobanteIngresoServicioId' => $comprobanteIngresoServicioId,
                 'piezaId' => $piezaId,
-                'piezaCDId' => $piezaCDId
+                'piezaCDId' => $piezaCDId,
+                'piezaTrackingId' => $piezaTrackingId,
+                'piezaNovedadId' => $piezaNovedadId
             ];
 
             $con->commit();
