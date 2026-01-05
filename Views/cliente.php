@@ -205,7 +205,7 @@
                                     </svg>
                                 </a>
                                 <ul class="nav nav-treeview">
-                                    <?php if(in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREADOR])){  ?>
+                                    <?php if(in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREADOR, PerfilCliente::DEFAULT])){  ?>
 
                                         <li class="nav-item">
                                             <a href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>pedidodeenvio/cartadocumento" class="nav-link">

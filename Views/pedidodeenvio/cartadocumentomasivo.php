@@ -15,7 +15,7 @@ $perfilUsuario = $_SESSION['idperfil'] ?? null;
 $clienteId = $_SESSION['cliente_id'] ?? null;
 
 //Redirigir si el usuario no tiene permisos para acceder a esta página
-if (!in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREADOR])) {
+if (!in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREADOR, PerfilCliente::DEFAULT])) {
 	echo "<script>window.location.href = '/principal/inicio';</script>";
 	exit();
 }
@@ -538,7 +538,7 @@ if (!in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::CREA
 
 	<div class="row">
 	    <div class="col-12">
-			<?php if($perfilUsuario == PerfilCliente::ADMINISTRADOR){ ?>
+			<?php if($perfilUsuario == PerfilCliente::ADMINISTRADOR || $perfilUsuario == PerfilCliente::DEFAULT){ ?>
                 <div class="span9 btn-block">
                     <button id="EntrarAModall" class="btn btn-large bg-success text-white" type="button">
                         <i class=""></i>
