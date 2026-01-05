@@ -29,7 +29,7 @@ $perfilUsuario = $request['perfilId'] ?? null;
 $cartaDocumentoId = $request['cartaDocumentoId'] ?? null;
 
 //Validar que el usuario tenga permisos para realizar esta acción
-if (!in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::AUTORIZADOR])) {
+if (!in_array($perfilUsuario, [PerfilCliente::ADMINISTRADOR, PerfilCliente::IMPRIMIDOR])) {
     http_response_code(403);
     echo json_encode([
         "status" => "error",
