@@ -19,7 +19,7 @@ use Service\InsertarPiezaGestionPostal;
 $log = new LogManager();
 
 /**
- * Enviar email de notificación de carta documento autorizada
+ * Enviar email de notificación
  * No crítico - los errores se loggean pero no interrumpen el proceso
  * 
  * @param array $data Datos del destinatario
@@ -29,7 +29,8 @@ $log = new LogManager();
  */
 function enviarEmailNotificacion($data, $cartaDocumentoId, $log) {
     try {
-        $destinatarioEmail = 'fernando.daniel.romano.2020@gmail.com'; //$data['destinatarioEmail'] ?? '';
+        $emailService = new EmailService();
+        $destinatarioEmail = $emailService->getNotificationRecipients($data['clienteId']);
         
         if (empty($destinatarioEmail)) {
             $log->warning("AjaxAutorizarCartaDocumento", "No se pudo enviar email: destinatario sin email", [
@@ -45,7 +46,6 @@ function enviarEmailNotificacion($data, $cartaDocumentoId, $log) {
         $body .= '<p>Pronto recibirá más información sobre el envío.</p>';
         $body .= '<br><p>Saludos cordiales,<br>Correo Flash</p>';
 
-        $emailService = new EmailService();
         $emailService->send($destinatarioEmail, $subject, $body, [
             'isHtml' => true
         ]);
