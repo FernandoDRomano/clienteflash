@@ -566,65 +566,6 @@
 	]);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//Mensajeria Mail
-    
-    // use PHPMailer\PHPMailer\PHPMailer;
-    // use PHPMailer\PHPMailer\Exception;
-    // //$EmailDeCliente = "correflash2017@gmail.com";//$_POST['us_mail']; ,sistemas2@correoflash.com
-	
-	// if($EmailDeCliente != ""){
-	// 	$EmailDeCliente = $EmailDeCliente. ",correflash2017@gmail.com";//$_POST['us_mail'];
-	// }else{
-	// 	$EmailDeCliente = $EmailDeCliente. "correflash2017@gmail.com";//$_POST['us_mail'];
-	// }
-	
-	// $EmailDeCliente = "correflash2017@gmail.com";
-	
-    // $mail = new PHPMailer(true);
-	// try {
-	// 	$body = '<p>Estimado cliente,</p>' .
-	// 	'<p>Su Carta Documento esta siendo procesada.</p>' .
-	// 	'<p>Recibirás en el transcurso del día un mail con el Codigo de Seguimiento donde podra conocer el estado de su Carta Documento en la pagina web del correo <a href="www.correoflash.com">www.correoflash.com</a></p>';
-
-	// 	//Server settings
-	// 	$mail->SMTPDebug = 0;                      
-	// 	$mail->isSMTP();                                            
-	// 	$mail->SMTPAuth = true; 
-	// 	$mail->SMTPSecure = getenv('MAIL_ENCRYPTION');
-	// 	$mail->Host = getenv('MAIL_HOST');
-	// 	$mail->Port = getenv('MAIL_PORT');
-	// 	$mail->Username = getenv('MAIL_USERNAME');
-	// 	$mail->Password = getenv('MAIL_PASSWORD'); 
-	// 	$mail->SetFrom( getenv('MAIL_USERNAME'), getenv('MAIL_FROM'), 0);
-    //     $mail->CharSet = 'UTF-8';
-	// 	$mail->Timeout = 10;
-	// 	$mail->IsHTML(true);
-	// 	//Recipients
-	// 	$Emails = explode( ',', $EmailDeCliente);
-	// 	for($i=0;$i<count($Emails);$i++){
-	// 		$mail->addAddress($Emails[$i]);     // Add a recipient
-	// 	}
-
-	// 	// Content
-	// 	$mail->isHTML(true);                                 
-	// 	$mail->Subject = html_entity_decode('Su Envio De Carta Documento');
-	// 	$mail->Body = html_entity_decode($body);
-		
-	// 	$mail->send();
-	// } catch (Exception $e) {
-	// 	$logger->exception('Error al enviar mail con el estado del pedido', $e, [
-	// 		'usuario_id' => $GPIdUsuario,
-	// 		'data' => $_REQUEST
-	// 	]);
-
-	// 	$RespuestaJsonAjax = array('');
-	// 	$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Pudo Enviar Mail Con El Estado Del Pedido",$RespuestaJsonAjax);
-	// 	if($RespuestaJsonAjax[0] == ""){
-	// 		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-	// 	}
-	// 	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	// }
-
 	// Mensajeria Mail
 	try {
         $emailService = new EmailService();
