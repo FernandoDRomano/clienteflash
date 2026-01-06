@@ -5,10 +5,12 @@ namespace Service;
 // Bootstrap central: carga Composer + .env y promueve variables
 require_once __DIR__ . '/../Config/bootstrap.php';
 
-// Cargar PHPMailer
-require_once __DIR__ . '/../PHPMailer/Exception.php';
-require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
-require_once __DIR__ . '/../PHPMailer/SMTP.php';
+// Si no hay Composer, cargar manualmente
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    require_once __DIR__ . '/../PHPMailer/Exception.php';
+    require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
+    require_once __DIR__ . '/../PHPMailer/SMTP.php';
+}
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
