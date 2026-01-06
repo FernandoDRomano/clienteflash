@@ -7,6 +7,7 @@
 	use Helpers\LogManager;
 	use Models\PiezaNovedad;
 	use Models\PiezaTracking;
+	use Service\EmailService;
 
 	$RespuestaJsonAjax = array('');
 	$_REQUEST = json_decode($_REQUEST["js"],true);
@@ -90,10 +91,11 @@
 	
 	$CantidadDePiezas = count($ArraydPiezas);
 	
-    $req_dump = print_r($_REQUEST, TRUE);
-    $fp = fopen('request.log', 'a');
-    fwrite($fp, $req_dump);
-    fclose($fp);
+    // Log de request (comentado por permisos - usar LogManager en su lugar)
+    // $req_dump = print_r($_REQUEST, TRUE);
+    // $fp = fopen('request.log', 'a');
+    // fwrite($fp, $req_dump);
+    // fclose($fp);
     
 	//Cansulta Para Error 1
 	$IdUsuario = issetornull('IdUsuario');
@@ -742,65 +744,57 @@
 	]);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//Mensajeria Mail
-    
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
-    //$EmailDeCliente = $EmailDeCliente. ",correflash2017@gmail.com";//$_POST['us_mail'];
-	
-	
-	if($EmailDeCliente != ""){
-		$EmailDeCliente = $EmailDeCliente. ",correflash2017@gmail.com,despachos2@correoflash.com,auditoria@correoflash.com";//$_POST['us_mail'];
-	}else{
-		$EmailDeCliente = $EmailDeCliente. "correflash2017@gmail.com,despachos2@correoflash.com,auditoria@correoflash.com";//$_POST['us_mail'];
-	}
-	
-    $mail = new PHPMailer(true);
+	// Mensajeria Mail
 	try {
-		$body = '<p>Estimado cliente,</p>' .
+        $emailService = new EmailService();
+        $destinatarioEmail = $emailService->getNotificationRecipients($GPIdUsuario);
+        
+        if (empty($destinatarioEmail)) {
+            $logger->warning("AjaxCartaDocumento", "No se pudo enviar email: destinatario sin email", [
+                'cartaDocumentoId' => $cartaDocumentoId
+            ]);
+			throw new Exception("Destinatario sin email");
+        }
+
+        $subject = "Su Envio De Carta Documento - Correo Flash";
+        
+       	$body = '<p>Estimado cliente,</p>' .
 		'<p>Su Carta Documento esta siendo procesada.</p>' .
 		'<p>Recibirás en el transcurso del día un mail con el Codigo de Seguimiento donde podra conocer el estado de su Carta Documento en la pagina web del correo <a href="www.correoflash.com">www.correoflash.com</a></p>' .
-		'<p>Email del cliente </p>' . $emailCliente ;
+		'<p>Email del cliente </p>';
 
-		//Server settings
-		$mail->SMTPDebug = 0;                      
-		$mail->isSMTP();                                            
-		$mail->SMTPAuth = true; 
-		$mail->SMTPSecure = getenv('MAIL_ENCRYPTION');
-		$mail->Host = getenv('MAIL_HOST');
-		$mail->Port = getenv('MAIL_PORT');
-		$mail->Username = getenv('MAIL_USERNAME');
-		$mail->Password = getenv('MAIL_PASSWORD'); 
-		$mail->SetFrom( getenv('MAIL_USERNAME'), getenv('MAIL_FROM'), 0);
-        $mail->CharSet = 'UTF-8';
-		$mail->Timeout = 10;
-		$mail->IsHTML(true);
-		//Recipients
-		$Emails = explode( ',', $EmailDeCliente);
-		for($i=0;$i<count($Emails);$i++){
-			$mail->addAddress($Emails[$i]);     // Add a recipient
-		}
+        $emailService->send($destinatarioEmail, $subject, $body, [
+            'isHtml' => true
+        ]);
 
-		// Content
-		$mail->isHTML(true);                                 
-		$mail->Subject = html_entity_decode('Su Envio De Carta Documento');
-		$mail->Body = html_entity_decode($body);
-		
-		$mail->send();
-		//echo 'Message has been sent';
-	} catch (Exception $e) {
-		$logger->exception('Error al enviar mail con el estado del pedido', $e, [
-			'usuario_id' => $GPIdUsuario,
-			'data' => $_REQUEST
-		]);
+        $logger->info("AjaxCartaDocumento", "Email de notificación enviado", [
+            'destinatario' => $destinatarioEmail
+        ]);
+
+    } catch (Exception $e) {
+        $logger->exception("Error al enviar email de notificación carta documento", $e, [
+            'destinatario' => $destinatarioEmail ?? 'N/A'
+        ]);
 
 		$RespuestaJsonAjax = array('');
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Pudo Enviar Mail Con El Estado Del Pedido",$RespuestaJsonAjax);
+		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error: Se genero su Carta Documento pero no se pudo enviar el correo con el estado del pedido",$RespuestaJsonAjax);
 		if($RespuestaJsonAjax[0] == ""){
 			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 		}
 		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	}
+    } catch (Throwable $t) {
+        $logger->exception("Error al enviar email de notificación carta documento", $t, [
+            'destinatario' => $destinatarioEmail ?? 'N/A'
+        ]);
+
+		$RespuestaJsonAjax = array('');
+		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error: Se genero su Carta Documento pero no se pudo enviar el correo con el estado del pedido",$RespuestaJsonAjax);
+		if($RespuestaJsonAjax[0] == ""){
+			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+		}
+		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
+    }
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		
