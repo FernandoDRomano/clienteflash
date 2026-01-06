@@ -307,7 +307,7 @@ async function buscarPiezasEstadosSispo() {
           // pieza.documento,
           // pieza.recibio,
           // pieza.vinculo,
-          pieza.foto_acuse,
+          pieza.existe_foto_acuse,
           boton
         ];
 
@@ -367,7 +367,7 @@ async function buscarDetallesDePiezasSispo(piezaId) {
       document.getElementById("EstadosDePiezasRecibió").value = pieza.recibio;
       document.getElementById("EstadosDePiezasVínculo").value = pieza.vinculo;
 
-      if (pieza.foto_acuse != null && pieza.foto_acuse !== "") {
+      if (pieza.existe_foto_acuse && pieza.existe_foto_acuse == "Sí") {
         document.getElementById("FotoAndroid").src = `https://archivoscompartidos.intranetflash.com/public/imagenes/acuses/${pieza.foto_acuse}`;
         document.getElementById("contenedor-acuse").classList.remove("d-none");
       }
@@ -861,36 +861,7 @@ function Reporte2() {
 }
 
 async function exportarCSVTabla(){
-  const piezasConFoto = PIEZAS_ESTADOS.filter(pieza => pieza.foto_acuse && pieza.foto_acuse.trim() !== "");
-  const files = piezasConFoto.map(pieza => pieza.foto_acuse).join(',')
-
-  Loading();
-
   try {
-    const request = await fetch("https://apiimagenes.intranetflash.com/api/buscar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ archivos: files  }),
-    })
-
-    const responseImagenes = await request.json();
-
-    PIEZAS_ESTADOS.forEach(pieza => {
-      if(!pieza.foto_acuse || pieza.foto_acuse.trim() == ""){
-        pieza.tiene_imagen = "No";
-        return;
-      }
-
-      if(responseImagenes[pieza.foto_acuse] && responseImagenes[pieza.foto_acuse] === true){
-        pieza.tiene_imagen = "Sí";
-      } else {
-        pieza.tiene_imagen = "No";
-      }      
-
-    });
-
     const csvHeaders = [
       'Id Pieza',
       'Barcode externo',
@@ -964,7 +935,7 @@ async function exportarCSVTabla(){
         pieza.fecha_resultado_3_distribucion,
         pieza.ultima_novedad,
         pieza.fecha_ultima_novedad,
-        pieza.tiene_imagen
+        pieza.existe_foto_acuse
       ];
       csvRows.push(row.map(value => `"${value}"`).join(','));
     });
@@ -982,8 +953,6 @@ async function exportarCSVTabla(){
 
   } catch (error) {
     console.error("Error al exportar CSV:", error);
-  } finally{
-    EndLoading();
-  }
+  } 
 }
 

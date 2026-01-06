@@ -4,8 +4,6 @@
     $InicioDeAnio = "InicioDeAnio";
     $Fecha = "Fecha";
 
-    use Config\Elementos as Elementos;
-
     $userId = $_SESSION['idusuario'] ?? null;
     $perfilUsuario = $_SESSION['idperfil'] ?? null;		
     $clienteId = $_SESSION['cliente_id'] ?? null;
@@ -16,13 +14,6 @@
     const PERFIL_USUARIO = <?= $perfilUsuario !== null ? $perfilUsuario : 'null' ?>;
     const CLIENTE_ID = <?= $clienteId !== null ? $clienteId : 'null ' ?>;
 </script>
-
-
-<!-- <link rel="stylesheet" href="<?php if (SUBDOMINIO != "") {
-                                    echo ("/" . SUBDOMINIO . "/");
-                                } else {
-                                    echo ("/");
-                                } ?>Styles/Styles/Tablero.css"> -->
 
 <div class="container">
     <div class="row">
@@ -119,14 +110,6 @@
                                         </table>
                                     </div>
                                 </div>
-
-                                <!-- <div class="row">
-                                    <div class="col-12 mb-4">
-                                        <?php
-                                        Elementos::CrearTabladashboard("EstadosDePiezas", "12", "", "display:block", false, 5000, "display:none", "display:none", false, "display:block", "display: none", "display: none");
-                                        ?>
-                                    </div>
-                                </div> -->
 
                                 <div class="row d-none" id="contenedor-acuse">
 
@@ -327,12 +310,6 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- TABLA -->
-                <!-- <?php
-                Elementos::CrearTabla("Solicitudes", "12", "", "display:block", false, 10, "display:none", "display:none", false, "display:block");
-                ?> -->
-                <!-- END TABLA -->
 
             </div>
         </div>
