@@ -1,8 +1,91 @@
-<?php
- //	echo("Suses");
- //	exit;
- 
+<?php 
     ini_set('memory_limit','9999M');
+
+    //Iniciar sessiones si no están iniciadas
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    header("Access-Control-Allow-Origin: *");
+        
+    // Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
+    require_once __DIR__ . '/../../Config/bootstrap.php';
+
+    use Throwable;
+    use Models\Pieza;
+    use Helpers\LogManager;
+
+    //Obtener datos de la request
+    $request = file_get_contents("php://input");
+    $request = json_decode($request, true);
+
+    $log = new LogManager();
+
+    $log->info("BuscarPiezasEstadosSispo", "Request recibida", $request);
+
+    $barcodeExterno = $request['BarcodeExterno'] ?? null;
+    $documento = $request['Documento'] ?? null;
+    $apellidoYNombre = $request['ApellidoYNombre'] ?? null;
+    $fechaInicial = $request['FechaI'] ?? null;
+    $fechaFinal = $request['FechaF'] ?? null;
+    $userId = $request['UserId'] ?? null;
+    $clienteId = $request['ClienteId'] ?? null;
+
+    try {
+        $piezaModel = new Pieza();
+        $data = $piezaModel->filtrar([
+            'BarcodeExterno' => $barcodeExterno,
+            'Documento' => $documento,
+            'ApellidoYNombre' => $apellidoYNombre,
+            'FechaI' => $fechaInicial,
+            'FechaF' => $fechaFinal,
+            'userId' => $userId,
+            'clienteId' => $clienteId
+        ]);
+
+        if (!$data || count($data) === 0) {
+            $log->info("BuscarPiezasEstadosSispo", "No se encontraron piezas con los filtros proporcionados.", [
+                'filtros' => $request
+            ]);
+
+            http_response_code(404);
+            echo json_encode([
+                'data' => [],
+                'message' => 'No se encontraron piezas con los filtros proporcionados.',
+                'status' => 'success'
+            ]); die;
+        }
+        
+        $data = EstadosEnFilas($data);
+
+        $indices = ['pieza_id','barcode_externo','sucursal','destinatario','direccion'
+                    ,'cp','localidad','estado_actual','fecha_estado_actual','cantidad_gestiones'
+                    ,'ingreso_logico','fecha_ingreso_logico','ingreso_fisico','fecha_ingreso_fisico'
+                    ,'enviado_a_1','fecha_enviado_a_1','recibido_en_1','fecha_recibido_en_1'
+                    ,'enviado_a_2','fecha_enviado_a_2','recibido_en_2','fecha_recibido_en_2'
+                    ,'fecha_1_distribucion','resultado_1_distribucion','fecha_resultado_1_distribucion'
+                    ,'fecha_2_distribucion','resultado_2_distribucion','fecha_resultado_2_distribucion'
+                    ,'fecha_3_distribucion','resultado_3_distribucion','fecha_resultado_3_distribucion'
+                    ,'ultima_novedad','fecha_ultima_novedad'
+                    ,'documento','recibio','vinculo','foto_acuse', 'imagen'];
+
+        $data = agregarIndices($data, $indices);
+
+        echo json_encode([
+            'data' => $data,
+            'message' => 'Piezas Encontradas.',
+            'status' => 'success'
+        ]); die;
+    } catch (Throwable $e) {
+        $log->exception("BuscarPiezasEstadosSispo", $e);
+        http_response_code(500);
+        echo json_encode([
+            'data' => null,
+            'message' => 'Ocurrió un error al buscar las piezas.',
+            'status' => 'error'
+        ]);
+        die;
+    }
     
     function EstadosEnFilas($respuesta){
         //return $respuesta;
@@ -45,34 +128,34 @@
             $PiezasConEstadosEnFila[7] = utf8_encode($EstadosDePiezas[0][8]);
             $PiezasConEstadosEnFila[8] = $EstadosDePiezas[0][7];
             
-            $PiezasConEstadosEnFila[9] = 'NULL';
+            $PiezasConEstadosEnFila[9] = null;
             
-            $PiezasConEstadosEnFila[10] = 'NULL';
-            $PiezasConEstadosEnFila[11] = 'NULL';
-            $PiezasConEstadosEnFila[12] = 'NULL';
-            $PiezasConEstadosEnFila[13] = 'NULL';
-            $PiezasConEstadosEnFila[14] = 'NULL';
-            $PiezasConEstadosEnFila[15] = 'NULL';
-            $PiezasConEstadosEnFila[16] = 'NULL';
-            $PiezasConEstadosEnFila[17] = 'NULL';
-            $PiezasConEstadosEnFila[18] = 'NULL';
-            $PiezasConEstadosEnFila[19] = 'NULL';
-            $PiezasConEstadosEnFila[20] = 'NULL';
-            $PiezasConEstadosEnFila[21] = 'NULL';
-            $PiezasConEstadosEnFila[22] = 'NULL';
-            $PiezasConEstadosEnFila[23] = 'NULL';
-            $PiezasConEstadosEnFila[24] = 'NULL';
-            $PiezasConEstadosEnFila[25] = 'NULL';
-            $PiezasConEstadosEnFila[26] = 'NULL';
-            $PiezasConEstadosEnFila[27] = 'NULL';
-            $PiezasConEstadosEnFila[28] = 'NULL';
-            $PiezasConEstadosEnFila[29] = 'NULL';
-            $PiezasConEstadosEnFila[30] = 'NULL';
+            $PiezasConEstadosEnFila[10] = null;
+            $PiezasConEstadosEnFila[11] = null;
+            $PiezasConEstadosEnFila[12] = null;
+            $PiezasConEstadosEnFila[13] = null;
+            $PiezasConEstadosEnFila[14] = null;
+            $PiezasConEstadosEnFila[15] = null;
+            $PiezasConEstadosEnFila[16] = null;
+            $PiezasConEstadosEnFila[17] = null;
+            $PiezasConEstadosEnFila[18] = null;
+            $PiezasConEstadosEnFila[19] = null;
+            $PiezasConEstadosEnFila[20] = null;
+            $PiezasConEstadosEnFila[21] = null;
+            $PiezasConEstadosEnFila[22] = null;
+            $PiezasConEstadosEnFila[23] = null;
+            $PiezasConEstadosEnFila[24] = null;
+            $PiezasConEstadosEnFila[25] = null;
+            $PiezasConEstadosEnFila[26] = null;
+            $PiezasConEstadosEnFila[27] = null;
+            $PiezasConEstadosEnFila[28] = null;
+            $PiezasConEstadosEnFila[29] = null;
+            $PiezasConEstadosEnFila[30] = null;
             $PiezasConEstadosEnFila[31] = utf8_encode($EstadosDePiezas[0][8]);
             $PiezasConEstadosEnFila[32] = $EstadosDePiezas[0][7];
             $PiezasConEstadosEnFila[33] = $EstadosDePiezas[0][14];
-            $PiezasConEstadosEnFila[34] = 'NULL';
-            $PiezasConEstadosEnFila[35] = 'NULL';
+            $PiezasConEstadosEnFila[34] = null;
+            $PiezasConEstadosEnFila[35] = null;
             $PiezasConEstadosEnFila[36] = '';
             /*
             $PiezasConEstadosEnFila[34] = $EstadosDePiezas[0][14];
@@ -188,6 +271,19 @@
         return $Respuesta;
 
         //return $respuesta;
+    }
+
+    function agregarIndices($data, $indices){
+        $dataConIndices = [];
+        for($i=0; $i < count($data); $i++){
+            $filaConIndices = [];
+            for($j=0; $j < count($data[$i]); $j++){
+                $indice = $indices[$j] ?? $j;
+                $filaConIndices[$indice] = $data[$i][$j];
+            }
+            $dataConIndices[] = $filaConIndices;
+        }
+        return $dataConIndices;
     }
  
  
