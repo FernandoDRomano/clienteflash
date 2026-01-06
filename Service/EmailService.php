@@ -2,6 +2,9 @@
 
 namespace Service;
 
+// Bootstrap central: carga Composer + .env y promueve variables
+require_once __DIR__ . '/../Config/bootstrap.php';
+
 // Cargar PHPMailer
 require_once __DIR__ . '/../PHPMailer/Exception.php';
 require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
@@ -10,6 +13,7 @@ require_once __DIR__ . '/../PHPMailer/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Helpers\LogManager;
+use Models\Cliente;
 
 /**
  * Servicio de envío de emails
@@ -141,6 +145,32 @@ class EmailService {
 
             throw $e;
         }
+    }
+
+    /**
+     * Obtener destinatarios para notificaciones según el entorno
+     * 
+     * En desarrollo: solo email de prueba
+     * En producción: emails de empresa + email del cliente
+     * 
+     * @param int $clienteId ID del cliente
+     * @return array Lista de emails destinatarios
+     */
+    public function getNotificationRecipients($clienteId) {
+        if(getenv('APP_ENV') == "development"){
+            return ['desarrollo2@correoflash.com'];
+        }
+        
+        $emailEmpresa = [
+            'correflash2017@gmail.com',
+            'despachos2@correoflash.com',
+            'auditoria@correoflash.com'
+        ]; 
+        
+        $clienteModel = new Cliente();
+        $emailCliente = $clienteModel->getEmailCliente($clienteId);
+        
+        return array_merge($emailEmpresa, [$emailCliente]);
     }
 
     /**

@@ -72,4 +72,34 @@ class Cliente {
             throw $e;
         }
     }
+
+    function getEmailCliente($clienteId) {
+        try {
+            if (empty($clienteId)) {
+                throw new Exception("El ID del cliente no puede estar vacío.");
+            }
+
+            if (!is_numeric($clienteId)) {
+                throw new Exception("El ID del cliente debe ser un número válido.");
+            }
+
+            $con = new ConexionSispo();
+            $sql = "
+                SELECT fcc.emails as email
+                FROM flash_clientes_contactos as fcc
+                WHERE fcc.cliente_id = {$clienteId}
+                limit 1
+            ";
+            $datos = $con->consultaRetorno($sql);
+            if ($row = mysqli_fetch_assoc($datos)) {
+                return $row['email'];
+            } else {
+                $this->logManager->warning("Cliente", "No se encontró email para el cliente con ID {$clienteId}");
+                return null;
+            }
+        } catch (Exception $e) {
+            $this->logManager->exception("Ocurrio un error al obtener el email del cliente {$clienteId}", $e);
+            throw $e;
+        }
+    }
 }
