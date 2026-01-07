@@ -1,5 +1,5 @@
 //Establecer titulo de la página
-document.title = "Autorizar Cartas de Documento | Clientes";
+document.title = "Gestionar Carta Documento | Clientes";
 
 //Deshabilitar click derecho
 document.addEventListener('contextmenu', event => event.preventDefault());
