@@ -93,6 +93,11 @@
 						return;
 					}
 
+					if($this->log->UsuarioActivoEnSispo($datos['Id'])== false){
+						echo "<script>const LOGIN_ERROR = {code: 403, message: 'Su usuario esta inactivo. Comuniquese con el comercial asignado a su cuenta.'}</script>";
+						return;
+					}
+
 					if($datos['Password']!= ""){
 						if (password_verify($_POST['us_password'], $datos['Password'])) {
 							

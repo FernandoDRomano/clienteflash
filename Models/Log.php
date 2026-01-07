@@ -81,6 +81,15 @@ include 'ConexionSispo.php';
 			return count($row) > 0;
 		}
 
+		public function UsuarioActivoEnSispo($id){
+			$con = new Conexion();
+			$sql = "SELECT Estado FROM cliente WHERE id = '{$id}' AND Estado = 1 ";
+			$datos = $con->consultaRetorno($sql);
+			$row = mysqli_fetch_assoc($datos);
+
+			return count($row) > 0;
+		}
+
 		public function GetClientePorEmail($email){
 			$con = new Conexion();
 			$sql = "SELECT * FROM cliente WHERE Mail = '{$email}' ";
