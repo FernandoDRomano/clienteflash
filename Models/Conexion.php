@@ -1,6 +1,11 @@
-<?php namespace Models;
-	class Conexion{
+<?php 
+
+namespace Models;
+	
+class Conexion{
+
 	private $con;
+	
 	public function __construct(){
 		if(!isset($this->con)){
 			$dbHost = getenv('DB_HOST');
@@ -26,6 +31,7 @@
 			mysqli_query($this->con, "set names 'utf8';");
 		}
 	}
+
 	public function consultaSimple($sql){
 		$resultado = mysqli_query($this->con,$sql);
 		if(!$resultado){
@@ -34,6 +40,7 @@
 			exit();
 		}
 	}
+
 	public function consultaRetorno($sql){
 		$datos = mysqli_query($this->con,$sql);
 		if(!$datos){
@@ -44,6 +51,7 @@
 			return $datos;
 		}
 	}
+
 	public function insertar($sql){
 		$resultado = mysqli_query($this->con, $sql);
 		if(!$resultado){
@@ -52,6 +60,26 @@
 			exit();
 		}
 		return mysqli_insert_id($this->con);
+	}
+
+	public function beginTransaction(){
+		mysqli_begin_transaction($this->con);
+	}
+
+	public function commit(){
+		mysqli_commit($this->con);
+	}
+
+	public function rollback(){
+		mysqli_rollback($this->con);
+	}
+
+	public function getConnection(){
+		return $this->con;
+	}
+
+	public function escapeString($string){
+		return mysqli_real_escape_string($this->con, $string);
 	}
 }
 ?>
