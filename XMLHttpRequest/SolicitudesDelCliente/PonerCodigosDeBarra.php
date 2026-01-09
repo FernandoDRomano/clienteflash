@@ -1,34 +1,16 @@
 <?php
 	header("Access-Control-Allow-Origin: *");
-	//header("Access-Control-Allow-Credentials: true");
-	//header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT, DELETE");
-	//header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	//header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+
+	// Bootstrap central: carga Composer + .env y promueve variables (ver Config/bootstrap.php)
+	require_once __DIR__ . '/../../Config/bootstrap.php';
+	use Service\EmailService;
+	use Helpers\LogManager;
+
+	$logger = new LogManager();
+
 	$RespuestaJsonAjax = array('');
-	//$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Cliente No Encntrado",$RespuestaJsonAjax);
-	//functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
-	
-	//print_r(count($_REQUEST));
-	
-	//print_r("<br>");
-	
-	//print_r($_REQUEST);
-	$_REQUEST = json_decode($_REQUEST["js"],true);
-	
-	//print_r($_REQUEST);
-	//print_r($_REQUEST["Piezas"]);
-	
-	//print_r(array_keys($_REQUEST)[1]);
-	
-	//print_r(json_decode("\"" . $_REQUEST[array_keys($_REQUEST)[1]] . "\""));
-	//print_r(json_decode($_REQUEST[array_keys($_REQUEST)[1]]);
-	//$_REQUEST["data"] = json_decode(json_encode(json_encode($_REQUEST[array_keys($_REQUEST)[1]])));
-	//print_r(json_decode($_REQUEST["data"]));
-	//print_r("<br>");
-	//$_REQUEST = json_decode("'" . $_REQUEST[array_keys($_REQUEST)[1]] . "'");
-	//$_GET = json_decode($_GET);
-	
-	
+
+	$_REQUEST = json_decode($_REQUEST["js"],true);	
 	
 	function functionRespuestaJsonAjax($String,$RespuestaJsonAjax){
 		if($RespuestaJsonAjax['0'] == ""){
@@ -64,67 +46,9 @@
 	require('../FuncionesHorarias.php');
 	$horaPasada = date("Y-m-d H:i:s", strtotime('2020-02-25 00:00:00'));
 	$HoraBusqueda = date('Y-m-d H:i:s', strtotime($horaPasada. $DiferenciaHoraria));
-	/*
-	$RespuestaJsonAjax = functionRespuestaJsonAjax("Api Iniciada",$RespuestaJsonAjax);
-	if($RespuestaJsonAjax[0] == ""){
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-	}
-	functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);
-	*/
 	
-	/*
-	$ApiKey = issetornull('ApiKey');
-	$SecretKey = issetornull('SecretKey');
-	$AccessToken = issetornull('AccessToken');
-	
-	$Data = array('api-key' => $ApiKey,'secret-key' => $SecretKey);
-	$PHPRespuesta = CURL("POST", "https://clientes.sispo.com.ar/api/tokens", $Data);
-	if($PHPRespuesta["http_code"] == 200){
-		if(isset($PHPRespuesta["json-data"])){
-			//echo("Error:Sin Datos De Respuesta");
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Sin Datos De Respuesta",$RespuestaJsonAjax);
-			if($RespuestaJsonAjax[0] == ""){
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-			}
-			functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-		}else{
-			if(isset($PHPRespuesta["access_token"])){
-				$AccessToken = $PHPRespuesta["access_token"];
-			}else{
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Con Datos Erroneos",$RespuestaJsonAjax);
-				if($RespuestaJsonAjax[0] == ""){
-					$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-				}
-				functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-			}
-		}
-	}else{
-		if(isset($PHPRespuesta["json-data"])){
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Sin Datos De Respuesta",$RespuestaJsonAjax);
-			if($RespuestaJsonAjax[0] == ""){
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-			}
-			functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-		}
-		$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:Inesperado",$RespuestaJsonAjax);
-		if($RespuestaJsonAjax[0] == ""){
-			$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
-		}
-		functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
-	}
-	*/
-	
-	//print_r($_REQUEST["IdUsuario"]);
-	
-	//print_r($_REQUEST["User"]);
-	//print_r($_REQUEST["time"]);
-	//print_r($_REQUEST["Piezas"]);
-	//print_r($_REQUEST["Piezas"][0]);
-	
-	//print_r($_REQUEST["Piezas"][0]["Pieza Id"]);
-	//print_r($_REQUEST["Piezas"][0]["Barcode A Establecer"]);
 	$CantidadDePiezas = count($_REQUEST["Piezas"][0]["Pieza Id"]);
-	//print_r($_REQUEST["Piezas"][0]["Test 2"]);
+
 	$Editadas = 0;
 	$archivoLog = 'registro-email.log';
 	$emails = [];
@@ -195,63 +119,58 @@
     
 	/////////////////////////////////////////////////////////////////////////////////
 	//ENVIAR EMAIL
-	use PHPMailer\PHPMailer\PHPMailer;
-	use PHPMailer\PHPMailer\Exception;
-
 	foreach ($emails as $correo) {
 		//SI NO SE ENVIO EL EMAIL ANTERIORMENTE, SE LE ENVIARA AHORA
 		if($correo['enviado'] != 1){
 
-			$mail = new PHPMailer(true);
 			try {
-				//Server settings
-				$mail->SMTPDebug = 0;                      //3 Enable verbose debug output
-				$mail->isSMTP();                                            // Send using SMTP
-				$mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
-				$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-			
-			
-				$mail->Username   = 'correo.flash.mail@gmail.com';                     // SMTP username (Aceptar app insegura en configuracion de mail.)
-				$mail->Password   = 'qprdelceuvlxjazw'; //vriwdufntdddazxe
+				$emailService = new EmailService();
+				$destinatarioEmail = $correo['email'];
 				
-				
-				$mail->SMTPSecure = 'tls';         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-				$mail->Port       = 587;                                    // TCP port to connect to
+				if (empty($destinatarioEmail)) {
+					$logger->warning("PonerCodigosDeBarra", "No se pudo enviar email: destinatario sin email", [
+						'piezaId' => $correo['pieza']
+					]);
+					throw new Exception("Destinatario sin email");
+				}
 
-				$mail->CharSet = 'UTF-8';
+				$subject = "Su Envío De Carta Documento - Correo Flash";
+				$body = $correo['body'];
 
-				$mail->setFrom('correo.flash.mail@gmail.com', 'CorreoFlash');
-				
-				
-						$mail->isHTML(true);   // Set email format to HTML
-						$mail->addAddress($correo['email']);
-						$mail->Subject = 'Su Envío De Carta Documento';
-						$mail->Body    = $correo['body'];
-						$mail->send();
-			
-						$mensaje = date('Y-m-d H:i:s') . " - INFO: Email Enviado a " . $correo['email'] . " - $mail->Body ";
-						$manejadorArchivo = fopen($archivoLog, 'a');
-						fwrite($manejadorArchivo, $mensaje . PHP_EOL); // PHP_EOL agrega un salto de línea al final del mensaje
-						fclose($manejadorArchivo);
-			
-						$id = $correo['pieza'];
-						$fecha = date('Y-m-d H:i:s');
-						$Columnas = array("");
-						$Consulta="
-							UPDATE sispoc5_gestionpostal.flash_piezas_cd SET EmailEnviado = 1, FechaEnvioEmail = '$fecha' WHERE IdFlashPieza = '$id'
-							#limit 1
-						";
-						$Resultado = $ClaseMaster->SQL_Master($Consulta,$Columnas,$time,false);
-				
+				$emailService->send($destinatarioEmail, $subject, $body, [
+					'isHtml' => true
+				]);
+
+				$logger->info("PonerCodigosDeBarra", "Email de notificación enviado", [
+					'destinatario' => $destinatarioEmail,
+					'piezaId' => $correo['pieza'],
+					'mensaje' => $body
+				]);
+
+				$id = $correo['pieza'];
+				$fecha = date('Y-m-d H:i:s');
+				$Columnas = array("");
+				$Consulta="UPDATE sispoc5_gestionpostal.flash_piezas_cd SET EmailEnviado = 1, FechaEnvioEmail = '$fecha' WHERE IdFlashPieza = '$id'";
+				$Resultado = $ClaseMaster->SQL_Master($Consulta,$Columnas,$time,false);
 
 			} catch (Exception $e) {
-				$mensaje = date('Y-m-d H:i:s') . " - Error: no se pudo enviar el email a $EmailDeCliente - $e ";
-				$manejadorArchivo = fopen($archivoLog, 'a');
-				fwrite($manejadorArchivo, $mensaje . PHP_EOL); // PHP_EOL agrega un salto de línea al final del mensaje
-				fclose($manejadorArchivo);
-				
+				$logger->exception("Error al enviar email de notificación carta documento", $e, [
+					'destinatario' => $destinatarioEmail ?? 'N/A'
+				]);
+
 				$RespuestaJsonAjax = array('');
-				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:No Se Pudo Enviar Mail al Cliente",$RespuestaJsonAjax);
+				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error: No se pudo enviar el correo al cliente",$RespuestaJsonAjax);
+				if($RespuestaJsonAjax[0] == ""){
+					$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
+				}
+				functionImpimirRespuestaJsonAjax($RespuestaJsonAjax);exit;
+			} catch (Throwable $t) {
+				$logger->exception("Error al enviar email de notificación carta documento", $t, [
+					'destinatario' => $destinatarioEmail ?? 'N/A'
+				]);
+
+				$RespuestaJsonAjax = array('');
+				$RespuestaJsonAjax = functionRespuestaJsonAjax("Error: No se pudo enviar el correo al cliente",$RespuestaJsonAjax);
 				if($RespuestaJsonAjax[0] == ""){
 					$RespuestaJsonAjax = functionRespuestaJsonAjax("Error:data:" ,$RespuestaJsonAjax);
 				}
