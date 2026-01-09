@@ -134,7 +134,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="">
 		<meta name="author" content="">
-		<title>Correoflash</title>
+		<title>Dashboard | CorreoFlash</title>
 
 		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/ImputUploads.css">
 		<link rel="stylesheet" href="<?php if(SUBDOMINIO != ""){echo ("/" . SUBDOMINIO. "/");}else{echo ("/");} ?>Styles/Styles/SubaDeImagenes.css">
@@ -180,6 +180,10 @@
 			var NoMemory = <?php echo json_encode($NoMemory); ?>;
 			var UserId = <?php echo json_encode($UserId); ?>;
 		</script>
+
+		<!-- Loading -->
+		<link href="/Styles/Styles/loading.css" rel="stylesheet" type="text/css">
+		<script src="/Js/loading.js"></script>
 
 	</head>
 	<div id="loading" name="loading" style="display:none">
