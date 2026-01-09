@@ -108,6 +108,22 @@
 			return;
 		}
 		Loading();
+		
+		// Timeout de seguridad para evitar que el proceso quede colgado indefinidamente
+		var firmasFaltantes = [];
+		var timeoutSeguridad = setTimeout(function(){
+			EndLoading();
+			if(typeof $.bootstrapGrowl === "function") {
+				$.bootstrapGrowl("Error: Tiempo de espera agotado al cargar firmas. Algunas imágenes no se encontraron.",{
+					type: 'danger',
+					align: 'center',
+					width: 'auto',
+					delay: 5000
+				});
+			}
+			console.error("Timeout alcanzado. Firmas que no pudieron cargarse:", firmasFaltantes);
+		}, 30000); // 30 segundos máximo
+		
 		//document.getElementById("iframePDF").style.display="block";
 		//Loading();
 		//setTimeout( CrearBasePDFDesdeDiv(div), 500 );
@@ -147,6 +163,22 @@
 				ArrayDeIMGDISMINUIDA[LoadingIMGDisminuidas].onload = function () {
 					LoadingIMG ++;
 					if(LoadingIMG==tabla.rows.length - Cabecera ){
+						// Cancelar timeout de seguridad
+						clearTimeout(timeoutSeguridad);
+						
+						// Mostrar advertencia si hay firmas faltantes
+						if(firmasFaltantes.length > 0){
+							console.warn("Firmas no encontradas:", firmasFaltantes);
+							if(typeof $.bootstrapGrowl === "function") {
+								$.bootstrapGrowl("Advertencia: " + firmasFaltantes.length + " firma(s) no se encontraron.",{
+									type: 'warning',
+									align: 'center',
+									width: 'auto',
+									delay: 4000
+								});
+							}
+						}
+						
 						//console.log(LoadingIMG);
 						
 						var ancho=216;
@@ -491,9 +523,26 @@
 					ArrayDeIMGDISMINUIDA[this.LoadingIMGDisminuidas].src = canvas.toDataURL("image/png");
 				}
 				ArrayIMG[CONTIMG].onerror= function () {
-					LoadingIMG ++;
-					//alert("Firma No Encontrada");
-					//CrearPDFDesdeDiv(div,null,pdf);
+					console.error("Error cargando firma: " + this.src);
+					console.error("Clase de imagen faltante: " + this.className);
+					
+					// Registrar firma faltante para mostrar al usuario
+					firmasFaltantes.push(this.className);
+					
+					// Crear canvas completamente transparente (sin texto) para que se pueda firmar manualmente
+					var placeholderCanvas = document.createElement('canvas');
+					placeholderCanvas.width = 200;
+					placeholderCanvas.height = 100;
+					var placeholderCtx = placeholderCanvas.getContext('2d');
+					
+					// Dejar completamente transparente (sin ningún contenido visible)
+					placeholderCtx.clearRect(0, 0, 200, 100);
+					
+					// Asignar canvas vacío a ArrayDeIMGDISMINUIDA para que se dispare su onload
+					ArrayDeIMGDISMINUIDA[this.LoadingIMGDisminuidas].className = this.className;
+					ArrayDeIMGDISMINUIDA[this.LoadingIMGDisminuidas].src = placeholderCanvas.toDataURL("image/png");
+					
+					console.log("Espacio vacío creado para firma manual: " + this.className);
 				};
 				DivDeImagenes.appendChild(ArrayIMG[CONTIMG]);
 				LoadingIMGDisminuidas++;
