@@ -160,7 +160,7 @@ class EmailService {
      */
     public function getNotificationRecipients($clienteId) {
         if(getenv('APP_ENV') == "development"){
-            return ['desarrollo2@correoflash.com'];
+            return getenv('MAIL_RECEPCION_DESARROLLO') ? [getenv('MAIL_RECEPCION_DESARROLLO')] : [];
         }
         
         $emailEmpresa = [
