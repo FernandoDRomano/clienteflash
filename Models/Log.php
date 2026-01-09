@@ -225,11 +225,6 @@ class Log {
 			$datos = $con->consultaRetorno($sql);
 			$row = mysqli_fetch_assoc($datos);
 
-			$this->logger->info("Log: esUsuarioActivo()", "Verificando si el usuario está activo: ", [
-				'username' => $this->us_name,
-				'SQL' => preg_replace('/\s+/', ' ', trim($sql))
-			]);
-
 			return count($row) > 0;
 		} catch (Exception $e) {
 			$this->logger->exception("Log: Error verificando si el usuario está activo: ", $e, [
